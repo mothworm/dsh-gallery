@@ -236,9 +236,22 @@ def build_one(psd_path, out_path, tgt_w, tgt_h, ring, feather, pad,
     img = canvas.crop(box).resize((tgt_w, tgt_h), Image.LANCZOS)
     a = np.asarray(img).astype("float64")
     yy, xx = np.mgrid[0:tgt_h, 0:tgt_w]
-    d = np.minimum(np.minimum(xx, tgt_w - 1 - xx), np.minimum(yy, tgt_h - 1 - yy)).astype("float64")
-    # keep:环内 1,往外 feather 距离线性淡到 0。feather 太小会在内缘留下"笔直硬切边"(11-19 样张翻过车)。
-    keep = np.clip((ring + feather - d) / max(1.0, float(feather)), 0.0, 1.0)
+    # ⚠ 11-20 **各向异性**环带:横、纵各一套 ring/feather,四条边取**并集**(np.maximum),不是交集。
+    #
+    # 为什么必须分轴:画布 720x260,同一个 88 px 在横轴只占 12%、在纵轴占 34%。原先用
+    # 「到最近四条边的最小距离」<= ring+feather 这一个标量,等于让纵轴的净空被横轴的环厚挟持
+    # —— 实测旧产物 x=10% 处 by 需求 49.8%(正文区纵向得让掉一半),而描边横条真实厚度只有 1-7 px
+    # (`probe-stroke.py` 实测)。这就是「文字被外环压住」的根因,折 Deco 治不到它。
+    #
+    # 取并集而不是交集:交集会让四角那一块**两轴都浅**的区域被砍掉,角素直接消失;
+    # 并集的意思是"只要还没深入环带内侧,就保留",四角自然由 Deco 自己决定深浅。
+    rx, ry, fx, fy = ring[0], ring[1], feather[0], feather[1]
+    dx = np.minimum(xx, tgt_w - 1 - xx).astype("float64")
+    dy = np.minimum(yy, tgt_h - 1 - yy).astype("float64")
+    # 环内 1,往外 feather 距离线性淡到 0。feather 太小会在内缘留下"笔直硬切边"(11-19 样张翻过车)。
+    kx = np.clip((rx + fx - dx) / max(1.0, float(fx)), 0.0, 1.0)
+    ky = np.clip((ry + fy - dy) / max(1.0, float(fy)), 0.0, 1.0)
+    keep = np.maximum(kx, ky)
     a[:, :, 3] *= keep
     Image.fromarray(a.astype("uint8"), "RGBA").save(out_path, optimize=True)
 
@@ -257,13 +270,12 @@ def build_one(psd_path, out_path, tgt_w, tgt_h, ring, feather, pad,
         "ring": ring, "feather": feather, "pad": p, "folded": folded,
         "fold": fold, "depth_rows": dt_rows, "depth_cols": dt_cols,
         "crop": box, "crop_wh": (box[2] - box[0], box[3] - box[1]),
-        "opaque_ring_pct": round(100.0 * (al[d < ring] > 8).mean(), 1),
+        "opaque_ring_pct": round(100.0 * (al[(dx < rx) | (dy < ry)] > 8).mean(), 1),
         "centre_max_alpha": int(cx.max()), "inner_rect": inner_rect,
         # 文字区脏度:括号里是「横内缩 / 纵内缩」占卡片宽高的比例(整图拉伸 ⇒ 画布%=卡片%)
         "ink_10_14": ink(0.10, 0.14), "ink_12_16": ink(0.12, 0.16), "ink_16_20": ink(0.16, 0.20),
         # 还有多少墨落在"两轴都深"的死角里(t_x>0.25 且 t_y>0.25)——这类像素必压在正文上
-        "deep_ink_px": int(((np.minimum(xx, tgt_w - 1 - xx) > 0.25 * tgt_w) &
-                            (np.minimum(yy, tgt_h - 1 - yy) > 0.25 * tgt_h) & s8).sum()),
+        "deep_ink_px": int(((dx > 0.25 * tgt_w) & (dy > 0.25 * tgt_h) & s8).sum()),
     }
 
 
@@ -273,8 +285,16 @@ def main():
     ap.add_argument("--out", required=True, help="成品目录(frame-<遁>.png)")
     ap.add_argument("--tw", type=int, default=720, help="成品画布宽(默认 720)")
     ap.add_argument("--th", type=int, default=260, help="成品画布高(默认 260 ⇒ 2.77:1,贴近典型卡片)")
-    ap.add_argument("--ring", type=int, default=58, help="保留外环厚(成品图坐标;渲染到 120 高卡片约 27px)")
-    ap.add_argument("--feather", type=int, default=30, help="内侧羽化(成品图坐标;<18 会看见硬切边)")
+    ap.add_argument("--ring", default="58",
+                    help="保留外环厚**分轴** (横,纵),成品图坐标:`--ring 44,18`。"
+                         "单值 = 两轴同值(缺省 58 = 11-19 发货版的老行为)。")
+    ap.add_argument("--feather", default="30",
+                    help="内侧羽化**分轴** (横,纵),成品图坐标:`--feather 26,14`。"
+                         "单值 = 两轴同值(缺省 30 = 老行为)。")
+    ap.add_argument("--aniso", action="store_true",
+                    help="显式承认自己在用**各向异性**环带。**默认关闭**时,若 ring/feather 的两轴值不同,"
+                         "就报错退出 —— 因为动它会让产物与 11-19 发货版不再逐字节相同,"
+                         "这件事必须是有意识的动作,不能靠默认值悄悄发生。")
     ap.add_argument("--pad", type=int, default=12, help="裁到画面边界后向外留多少源像素")
     ap.add_argument("--only", default=None, help="只出一张(earth/fire/... 或 doton/katon/...)")
     ap.add_argument("--fold", action="store_true",
@@ -290,6 +310,22 @@ def main():
     args = ap.parse_args()
     os.makedirs(args.out, exist_ok=True)
     want = ALIAS.get(args.only, args.only) if args.only else None
+    # 「横,纵」二元组;单值 = 两轴同值。分轴就是各向异性,得显式 --aniso 认可(见 --aniso 说明)。
+    def pair(s, name):
+        v = [int(round(float(x))) for x in str(s).split(",") if x.strip()]
+        if len(v) == 1:
+            v = v * 2
+        if len(v) != 2 or min(v) < 0:
+            ap.error("%s 只接受 `横` 或 `横,纵`(非负整数),收到 %r" % (name, s))
+        return tuple(v)
+    ring = pair(args.ring, "--ring")
+    feather = pair(args.feather, "--feather")
+    if ring[0] != ring[1] or feather[0] != feather[1]:
+        if not args.aniso:
+            ap.error("ring=%s feather=%s 两轴不同 = 各向异性环带,产物会与 11-19 发货版**不再逐字节相同**。"
+                     "确认要动就加 --aniso;只想跑等价性对照就别传这两组参数。" % (args.ring, args.feather))
+        if feather[0] < 1 or feather[1] < 1:
+            ap.error("feather 两轴都必须 >= 1,否则 kx/ky 的分母被钳成 1、羽化距离与参数不符")
     fl = tuple(x.strip() for x in args.fold_layers.split(",") if x.strip())
     band = tuple(float(v) for v in args.band.split(","))
     margin = tuple(float(v) for v in args.margin.split(","))
@@ -304,7 +340,7 @@ def main():
             print("  -- %s 没找到 %s.psd,跳过" % (mode, stem))
             continue
         dst = os.path.join(args.out, "frame-%s.png" % mode)
-        r = build_one(src, dst, args.tw, args.th, args.ring, args.feather, args.pad,
+        r = build_one(src, dst, args.tw, args.th, ring, feather, args.pad,
                       fold=fold, fold_layers=fl)
         if not r:
             continue
@@ -313,8 +349,11 @@ def main():
         print("          裁到画面 %dx%d(源坐标 %s) -> 成品 %dx%d(%.2f:1)" % (
             r["crop_wh"][0], r["crop_wh"][1], r["crop"], r["size"][0], r["size"][1],
             r["size"][0] / float(r["size"][1])))
-        print("          环 %dpx + 羽化 %dpx:环内不透明 %.1f%%,渲染到 120 高卡片约 %.0f px 厚" % (
-            r["ring"], r["feather"], r["opaque_ring_pct"], r["ring"] * 120.0 / r["size"][1]))
+        print("          环 %dpx×%dpx + 羽化 %dpx×%dpx(横,纵):环内不透明 %.1f%%,"
+              "渲染到 120 高卡片纵轴约 %.0f px 厚、横轴约 %.0f px" % (
+                  r["ring"][0], r["ring"][1], r["feather"][0], r["feather"][1],
+                  r["opaque_ring_pct"],
+                  r["ring"][1] * 120.0 / r["size"][1], r["ring"][0] * 120.0 / r["size"][1]))
         print("          折叠 %s 作用于 %s" % (
             ("带 %s 余量 %s" % (r["fold"][0], r["fold"][1])) if r["fold"] else "关闭",
             r["folded"] or "无一层(=老行为)"))

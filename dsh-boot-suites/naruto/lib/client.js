@@ -1169,6 +1169,9 @@ window.__ModuleLoader__.load({
 		let el = {};          // 这几个节点缓存住,别每次 querySelector
 		let tkTheme = null;   // ctx.inject(["theme"]) 给的句柄
 		let panelOpen = false;
+		// 构建戳:探针日志和「点配饰按钮」那条日志**共用这一个常量**。写成两处字面量的话,
+		// 总有一天只改了一处 —— 那时日志一半说 b1931、一半说 b2011,而两边都"看起来像新代码在跑"。
+		const BUILD_STAMP = "b2011";
 		let PENDING;          // 刚点过、等清单回读出同一个 id 才算真生效
 		let chipHold = 0, chipTimer = null;
 
@@ -1493,18 +1496,42 @@ window.__ModuleLoader__.load({
 		// 底框是**整图缩放 + 只留外环**(丙,用户 11-19 看过甲/乙/丙对照样张后选定):
 		// 成品 PNG 中央烤成透明,整张按 `background-size:100% 100%` 贴满卡片 ⇒ 中央仍是那块吃滑块的 CSS 填充层,
 		// 所以"点开悬浮球拖滑块改透明度"只改文字底、底框纹丝不动(这条语义从九宫时代继承下来,没变)。
-		// `in` = 激活底框时给**文字额外内缩**多少 px(核对表实测:不内缩的话 10 格里第一行行首全被左上元素压住)。
+		// `in` 的历史:11-19~11-20 上午这里每档还带一个硬编码的纵向内缩像素值(横向再 +10),也就是"底图 720 宽再缩到
+		// 卡片时,横竖都白内缩同样的几十 px"。11-20 换成按**比例**算(见上面 FRAME_INSET),单位从 px 变成 %,
+		// 所以档位表里只剩 file;那个字段整个删掉了 —— 留着它迟早有人以为它还在生效。
 		// 配饰颜色现在不吃 palette(位图底框自带颜色),但 applyDecoVars(pal) 的调用点(L316 render)照旧,
 		// 所以这个变量留着当"最后一次见过的 palette"占位 —— 删了它,那行赋值就是 ReferenceError。
 		let decoPal = null;
 		const DECO_KEY = NS + "-deco";
+		// 底框成品的**环带几何**(成品画布 720x260 的像素,横,纵)。**唯一来源是生成器**:
+		// `dsh-naruto-pack\tools\build-frames.py --ring 44,14 --feather 26,10 --aniso`(用户 11-20 定 C 档)。
+		// 这里只抄它的输出,不许自己另调一套 —— 抄错了净空就会算错(而那种错在真机上是"首行被角素压住",
+		// 看起来像审美问题,不像算错)。配套对照表(probe-clear.py 出的五遁最坏值,x=10% 一档):纵需让到 8.9%。
+		const FRAME_W = 720, FRAME_H = 260;
+		const FRAME_RING = [44, 14];      // 保留外环厚 横/纵
+		const FRAME_FEATHER = [26, 10];   // 内侧羽化 横/纵
+		// 卡片内缩 = **比例**内缩(画布% == 卡片%),因为整图按 `background-size:100% 100%` 拉伸 ⇒ 底图上的
+		// 一个百分比落到卡片上还是同一个百分比。11-20 之前这里是硬编码 26/36 px:矮卡(120)上 26px 等于
+		// 22% 纵向、高卡(230)上只等于 11% —— 同一套数字在三种卡高上净空不同,这就是用户点名的
+		// 「矮卡纵向被压扁」的第二个成因(第一个是环带本身用了 min(到四边距离),已由 --aniso 治掉)。
+		//
+		// ⚠ **比例的分子分母必须同一量纲**。第一版写的是 (ring+feather)/FRAME_W 对**两轴**都除 720,
+		// 结果是 ins_x=9.72% / ins_y=3.69% —— 纵向只有横向的 38%,自测当场抓到 `纵向小于横向`。
+		// 纵轴的 24px 是 24/260,不是 24/720。改这里之前先想清楚"这一维的 100% 到底是谁"。
+		const FRAME_INSET = {
+			x: (FRAME_RING[0] + FRAME_FEATHER[0]) / FRAME_W * 1.15,   // 70/720 = 9.72% -> 11.18%
+			y: (FRAME_RING[1] + FRAME_FEATHER[1]) / FRAME_H * 1.15,   // 24/260 = 9.23% -> 10.61%
+		};
+		// 卡片宽度**不写常数**:产品里量 node.getBoundingClientRect().width(下面 applyDecoVars),
+		// 所以窗口拖窄、宿主改宽都自动跟上。这一行曾经留了个 `FRAME_CARD_W = 420` 的"参考宽",
+		// 结果产品里根本没人用它 —— 那只会让人以为内缩按 420 写死。
 		const DECO_MODES = {
-			none: { file: null, in: 0 },
-			doton: { file: "frame-doton.png", in: 26 },
-			katon: { file: "frame-katon.png", in: 26 },
-			raton: { file: "frame-raton.png", in: 26 },
-			suiton: { file: "frame-suiton.png", in: 26 },
-			futon: { file: "frame-futon.png", in: 26 },
+			none: { file: null },
+			doton: { file: "frame-doton.png" },
+			katon: { file: "frame-katon.png" },
+			raton: { file: "frame-raton.png" },
+			suiton: { file: "frame-suiton.png" },
+			futon: { file: "frame-futon.png" },
 		};
 		// 面板按钮的顺序 = 用户给的顺序,别自己排
 		const DECO_LABELS = [["none", "无"], ["doton", "土遁"], ["katon", "火遁"], ["raton", "雷遁"], ["suiton", "水遁"], ["futon", "风遁"]];
@@ -1578,24 +1605,56 @@ window.__ModuleLoader__.load({
 			root.removeAttribute("data-bs-frame");
 			if (uri) {
 				const b = ensurePadBaseline();
-				if (b) {
-					const ey = m.in;            // 纵向:环宽
-					const ex = m.in + 10;       // 横向多给 10px:核对表里左上那团圆素在矮卡上伸得更远
+				// 比例内缩要换算成 px,就得知道卡片有多宽 —— 宽是宿主的(常见 420,也可能被用户拖窄)。
+				// 量不到(还没有卡片 / 宽为 0)就**不内缩**并留诊断,与"量不到基线"同一原则:
+				// 宁可首行被角素压一下,也不拿一个猜出来的百分比去改坏所有卡片。
+				let cw = 0;
+				try {
+					const node = document.querySelector(CARD_SEL);
+					if (node) cw = node.getBoundingClientRect().width || 0;
+				} catch (e) { cw = 0; }
+				if (b && cw > 0) {
+					// 夹具/真机都可能量到一个极窄的宽度;夹到 [240, 900] 免得算出荒谬的内缩(窄卡宁可按 240 算,宽卡按 900 封顶)
+					const cwUse = Math.min(900, Math.max(240, cw));
+					const ex = Math.round(cwUse * FRAME_INSET.x);   // 横向:按卡宽折算
+					const ey = Math.round(cwUse * FRAME_INSET.y);   // 纵向:同一把尺子(画布% == 卡片%,所以也按卡宽折算)
 					root.style.setProperty("--bs-frame-pt", (b.t + ey) + "px");
 					root.style.setProperty("--bs-frame-pr", (b.r + ex) + "px");
 					root.style.setProperty("--bs-frame-pb", (b.b + ey) + "px");
 					root.style.setProperty("--bs-frame-pl", (b.l + ex) + "px");
 					root.setAttribute("data-bs-frame", mode);
-				} else {
+					lastFrameInset = { x: ex, y: ey, cw: Math.round(cw) };
+				} else if (!b) {
 					diagWarn("frame-pad-skipped", "量不到卡片基线 padding,这档不内缩(首行可能被角素压住)");
+				} else {
+					diagWarn("frame-width-skipped", "量不到卡片宽度(为 0),这档按比例内缩算不出来 ⇒ 不内缩");
 				}
 			}
 			if (el.decoBtns) for (const k in el.decoBtns) el.decoBtns[k].setAttribute("aria-pressed", k === mode ? "true" : "false");
 		}
+		// 上一次真正写进 CSS 的内缩(px)。给探针用:**它是"用户点了一下之后确实生效了吗"的直接证据**,
+		// 而不是"我读了一遍源码里写着 26"。
+		let lastFrameInset = null;
 		function setDeco(k) {
 			if (!DECO_MODES[k]) return;
 			try { window.localStorage.setItem(DECO_KEY, k); } catch (e) { diagWarn("deco-store-failed", e && e.message); }
+			lastFrameInset = null;
 			applyDecoVars(null);
+			// 11-20 补证据:交接单里「真机验收 `deco=<遁> frame=1` 至今没有」的根因是 **点按钮这条路径一行日志都不打**
+			// (只有 panelOpen 时的 contrastProbe 会打,而那时用户已经点完了)。这里补一条**点完立刻发**的记录,
+			// 和探针那条同一套字段(deco/frame),另加 inx/iny(实际写进 CSS 的 px 内缩)与 cw(量到的卡宽)。
+			// 落盘规则是"只写标量"(宿主 lib/index.js:663),所以这里全部是标量,数组会被静默丢掉。
+			try {
+				const uri = (DECO_MODES[k] || DECO_MODES.none).file ? frameUrl(DECO_MODES[k].file) : null;
+				const ins = lastFrameInset;
+				fetch("/dsh-boot-naruto/report", {
+					method: "POST", cache: "no-store", headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						deco: k, frame: uri ? 1 : 0, b: BUILD_STAMP,
+						inx: ins ? ins.x : -1, iny: ins ? ins.y : -1, cw: ins ? ins.cw : 0,
+					}),
+				}).catch(() => {});
+			} catch (e) {}
 		}
 
 		function cardJson() {
@@ -1881,14 +1940,20 @@ window.__ModuleLoader__.load({
 					//   frame = 这一档的底框 URL 有没有从清单 st.ui.files[].url 里解析出来(1 有 / 0 没有)。
 					//   frame=0 而 deco≠none ⇒ 十有八九是资源包没把 PNG 放进 arts\ui\,或文件名对不上(大小写除外)。
 					//   为什么不能只看画面:border-image 的图挂了不留任何痕迹,"看不到框"和"没加载新代码"长一模一样。
-					// 构建戳(现在 b1931 = 丙方案那版,前一版 b1911 = 旧九宫):日志里出现当前这个戳,就是"新代码真在跑"的直接证据,不用肉眼比对。
+					// 构建戳(现在 b2011 = 各向异性环带 C 档 ring 44,14 + 比例内缩;前一版 b1931 = 丙方案标量环 58/30):
+					// 日志里出现当前这个戳,就是"新代码真在跑"的直接证据,不用肉眼比对。
 					const curMode = decoGet();
 					const curFile = (DECO_MODES[curMode] || DECO_MODES.none).file;
 					post({
-						contrast: tagKey, b: "b1931", ran: probeRuns, examined: examined, on: on, off: off,
+						contrast: tagKey, b: BUILD_STAMP, ran: probeRuns, examined: examined, on: on, off: off,
 						under19: under, lights: lights.length, healed: healed,
 						spin: ballEl ? (ballEl.classList.contains("no-spin") ? 0 : 1) : 2,
 						deco: curMode, frame: curFile && frameUrl(curFile) ? 1 : 0,
+						// 11-20:这条是**验收「文字不再被外环压住」的直接证据** —— 实际写进 CSS 的内缩,
+						// 以及算它用的卡宽。五遁/三种卡高各打一行,表就能直接对 check: iny ≈ 卡高 x 10.6%。
+						inx: lastFrameInset ? lastFrameInset.x : -1,
+						iny: lastFrameInset ? lastFrameInset.y : -1,
+						cw: lastFrameInset ? lastFrameInset.cw : 0,
 					});
 				}
 				let sent = 0;

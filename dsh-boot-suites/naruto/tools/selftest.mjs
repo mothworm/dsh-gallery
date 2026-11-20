@@ -14,6 +14,9 @@ const BUNDLE = path.join(SUITE, 'lib', 'client.js')
 const code = fs.readFileSync(BUNDLE, 'utf8')
 
 let total = 0
+// 11-20:底框内缩的期望值在**两个块作用域**里都要用(源码形状那段 + 行为段),所以挂一个全局。
+// 由源码里的 FRAME_RING/FRAME_FEATHER 现算,不钉数字(见下面 GEO 的赋值处)。
+let GEO = null
 const fails = []
 const ok = (cond, msg) => { total++; if (!cond) { fails.push(msg); console.log('  FAIL ' + msg) } else console.log('  ok   ' + msg) }
 const near = (a, b, eps, msg) => ok(Math.abs(a - b) <= eps, msg + ' (实际 ' + a + ',期望 ' + b + ')')
@@ -529,8 +532,28 @@ console.log('\n[5c] 瞳纹形状与瞳红')
     '底框是**丙方案整图缩放**(::after 上 background-image + background-size:100% 100%);旧九宫 border-image 必须彻底不在')
   ok(!/background-image:var\(--bs-deco-a/.test(SRC),
     '更早那版 --bs-deco-a/-b 两层 background-image 也不许残留(它和丙用同一个属性,回来就会互相顶掉)')
-  ok(/none: \{ file: null, in: 0 \}/.test(SRC),
-    '「配饰:无」真的既不画底框也不内缩(file=null 且 in=0,不是只藏了一半)')
+  ok(/none: \{ file: null \}/.test(SRC),
+    '「配饰:无」真的既不画底框也不内缩(file=null;没有 file 就解析不出 URL,内缩那条路整个不进)')
+  // 11-20:内缩从硬编码 26/36 px 改成**按环带几何的比例**(C 档 ring 44,14 / feather 26,10)。
+  // 这里不钉死某个数字,而是**把产品源码里的 FRAME_RING/FRAME_FEATHER 解析出来**再算期望值 ——
+  // 钉死数字的话,下次调参就得改自测(假失败),而"改了参数忘了改 CSS"这种真错反而查不出来。
+  // ⚠ 挂在全局上:行为断言那几块在别的块作用域里(它们自己读产物,不蹭局部变量),需要同一个期望值。
+  GEO = (() => {
+    const m1 = SRC.match(/const FRAME_RING = \[(\d+), (\d+)\];/)
+    const m2 = SRC.match(/const FRAME_FEATHER = \[(\d+), (\d+)\];/)
+    if (!m1 || !m2) return null
+    const rx = +m1[1], ry = +m1[2], fx = +m2[1], fy = +m2[2]
+    // ⚠ 两轴各自的"100%"不同:横是成品画布宽 720,纵是画布高 260。第一版两轴都除 720,
+    // 得到 insY=13px —— 纵向只剩横向的 38%,自测当场红。这条算式必须照抄产品里的同一把尺子。
+    return { rx, ry, fx, fy, insX: Math.round(420 * (rx + fx) / 720 * 1.15), insY: Math.round(420 * (ry + fy) / 260 * 1.15) }
+  })()
+  {
+    const geo = GEO
+    ok(!!geo && geo.insY < geo.insX,
+      '文字内缩按**环带几何**算且**纵向小于横向**(各向异性:上下边带比左右窄,纵向还白让 26 就不对了)。实际 ' + (geo ? JSON.stringify(geo) : '源码里解析不出 FRAME_RING/FRAME_FEATHER'))
+    ok(/FRAME_INSET/.test(SRC) && !/in: 26/.test(SRC),
+      '硬编码的 `in: 26` 已彻底不存在(档位表里只剩 file;留着旧字段迟早有人以为它还在生效)')
+  }
   ok(/":root\[data-bs-frame\] " \+ CARD_SEL/.test(SRC) && /root\.removeAttribute\("data-bs-frame"\)/.test(SRC) && /root\.setAttribute\("data-bs-frame", mode\)/.test(SRC),
     '文字内缩被 data-bs-frame 门控,且**每轮先摘再按需挂** —— 没激活底框、或量不到基线时那条 padding 规则一个像素都不生效(用户的硬要求:其他效果不变)')
   ok(/getComputedStyle\(node\)/.test(SRC) && /paddingTop/.test(SRC) && /--bs-frame-pl/.test(SRC),
@@ -559,8 +582,10 @@ console.log('\n[5c] 瞳纹形状与瞳红')
   ok(/return DECO_MODES\[v\] \? v : "none"/.test(SRC),
     '老 localStorage 里的旧档位存档一律降级成「无」:改档位不许让老浏览器崩,也不许画出半只旧纹样')
   // —— 验收通道本身也得有闸:不然哪天探针列被删了,"刷新后看日志"这条验收就悄悄失效 ——
-  ok(/deco: curMode, frame: curFile/.test(SRC) && /b: "b\d{4}"/.test(SRC),
-    '探针带 deco/frame 两列、构建戳是 b+4 位(刷完页面 grep 一下就知道新代码在不在跑,不用肉眼猜)')
+  ok(/deco: curMode, frame: curFile/.test(SRC) && /b: BUILD_STAMP/.test(SRC) && /const BUILD_STAMP = "b\d{4}"/.test(SRC),
+    '探针带 deco/frame 两列、构建戳**只有一个来源**(BUILD_STAMP 常量)且是 b+4 位')
+  ok(/inx: lastFrameInset \? lastFrameInset\.x : -1/.test(SRC) && /deco: k, frame: uri \? 1 : 0, b: BUILD_STAMP/.test(SRC),
+    '点配饰按钮**立刻**打一条带 deco/frame/inx/iny/cw 的记录(交接单里「deco=<遁> frame=1 至今没有」就是因为这条路径原先一行日志都不打)')
   ok(/STATE\.st && STATE\.st\.ui/.test(SRC) && /String\(f\.name\)\.toLowerCase\(\) === file/.test(SRC),
     '底框 URL 只从清单 st.ui 的 files[].url 查,且按**小写名**匹配(好友投放时大小写随意都对得上)')
   ok(!/\/dsh-boot-naruto\/arts\/ui\//.test(SRC),
@@ -655,6 +680,10 @@ function mkRow(kind) {
   const row = mkNode('div'); row.dataset.chatFlowKind = kind
   const anchor = mkNode('div'); anchor.dataset.slot = 'conversation.chat.node'; anchor._display = 'contents'
   const body = mkNode('div'); body._text = '正文-'.repeat(3)
+  // 11-20:文字内缩改成**按比例**(环带内侧 / 720 x 1.15),所以产品会量卡片宽度。
+  // 替身必须给一个真实尺寸 —— 给 0 会让内缩永远走"量不到宽度"的降级分支,自测就测不到真逻辑
+  // (与上一版"缺 removeAttribute"同类的坑:夹具不全 == 假绿)。
+  body._r = { left: 260, top: 0, width: 420, height: 120 }
   anchor.appendChild(body); row.appendChild(anchor); conv.appendChild(row)
   return body
 }
@@ -729,8 +758,9 @@ loaded.exports.apply({ inject: (deps, cb) => { ok(Array.isArray(deps) && deps[0]
     ok(R.getAttribute('data-bs-frame') === 'katon', '点火遁 -> 门控属性挂上(data-bs-frame=katon)')
     ok(/arts\/ui\/frame-katon\.png/.test(R.style.getPropertyValue('--bs-frame-src')),
       '底框 URL 确实来自清单 st.ui 的 files[].url(代码里 0 素材,靠注入而不是硬编码路径)')
-    ok(R.style.getPropertyValue('--bs-frame-pt') === '40px' && R.style.getPropertyValue('--bs-frame-pl') === '52px',
-      '文字内缩 = 实测基线 14/16 + 环宽 26/36 —— 加在宿主那份 padding 上,不是我们拍的绝对值')
+    ok(R.style.getPropertyValue('--bs-frame-pt') === (14 + GEO.insY) + 'px' && R.style.getPropertyValue('--bs-frame-pl') === (16 + GEO.insX) + 'px',
+      '文字内缩 = 实测基线 14/16 + **按比例**算出的 ' + GEO.insX + '/' + GEO.insY + 'px(环带内侧 x1.15,卡宽 420;'
+      + '加在宿主那份 padding 上,不是我们拍的绝对值)。实际 ' + R.style.getPropertyValue('--bs-frame-pt') + ' / ' + R.style.getPropertyValue('--bs-frame-pl'))
     T.el.decoBtns.none.dispatch('click')
     ok(R.getAttribute('data-bs-frame') === null,
       '点「无」-> 门控属性摘掉,那条 padding 规则一个像素都不匹配("其他效果不变"是行为层面的保证,不是口头保证)')
@@ -749,8 +779,8 @@ loaded.exports.apply({ inject: (deps, cb) => { ok(Array.isArray(deps) && deps[0]
     T.el.decoBtns.katon.dispatch('click')
     ok(R.style.getPropertyValue('--bs-frame-src') === 'url("/dsh-boot-naruto/arts/ui/frame-katon.png")',
       '清单没给 files 时**推导前缀拼路径**(真宿主就是这形状;只信清单则底框永远 frame=0 —— 本轮抓到的真 bug)。实际 ' + R.style.getPropertyValue('--bs-frame-src'))
-    ok(R.getAttribute('data-bs-frame') === 'katon' && R.style.getPropertyValue('--bs-frame-pt') === '40px',
-      '走兜底 URL 也一样要内缩:内缩跟的是"有没有底框",不是"URL 从哪来"')
+    ok(R.getAttribute('data-bs-frame') === 'katon' && R.style.getPropertyValue('--bs-frame-pt') === (14 + GEO.insY) + 'px',
+      '走兜底 URL 也一样要内缩:内缩跟的是"有没有底框",不是"URL 从哪来"。实际 ' + R.style.getPropertyValue('--bs-frame-pt'))
     // 2) 未来宿主若给共享目录登记了素材 ⇒ 必须优先用清单里那条带 ?v= 的
     st.ui = { id: 'ui', ok: true, url: '/dsh-boot-naruto/arts/ui/preset.json?v=u1', files: [{ name: 'frame-katon.png', version: 'u1', url: '/dsh-boot-naruto/arts/ui/frame-katon.png?v=u1' }] }
     T.el.decoBtns.none.dispatch('click')
@@ -799,8 +829,8 @@ loaded.exports.apply({ inject: (deps, cb) => { ok(Array.isArray(deps) && deps[0]
       T.el.decoBtns.katon.dispatch('click')
       ok(doc.documentElement.style.getPropertyValue('--bs-frame-src') === 'url("/dsh-boot-naruto/arts/ui/frame-katon.png")',
         '吃**真清单**也解析得出底框 URL(前缀从宿主自己给的 /arts/…/preset.json?v= 切出来)。实际 ' + doc.documentElement.style.getPropertyValue('--bs-frame-src'))
-      ok(doc.documentElement.getAttribute('data-bs-frame') === 'katon' && doc.documentElement.style.getPropertyValue('--bs-frame-pt') === '40px',
-        '真清单下门控属性与文字内缩一样生效(内缩不依赖 URL 来源)')
+      ok(doc.documentElement.getAttribute('data-bs-frame') === 'katon' && doc.documentElement.style.getPropertyValue('--bs-frame-pt') === (14 + GEO.insY) + 'px',
+        '真清单下门控属性与文字内缩一样生效(内缩不依赖 URL 来源)。实际 ' + doc.documentElement.style.getPropertyValue('--bs-frame-pt'))
       T.el.decoBtns.none.dispatch('click')
       // 真数据里 tobirama-night 的 files 混着 kunai.png —— 主题画面不许挑到它
       const tn = st2.list.find((p) => p.id === 'tobirama-night')
