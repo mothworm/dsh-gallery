@@ -1,0 +1,1837 @@
+{
+ "_note": "从运行中的桌面版宿主 GET 出来的真数据,供 tools/selftest-client.mjs 验 \"没点名的预设不会被 clips 目录抢占\"。刷新方法见同目录 FIXTURE-README.md。",
+ "_fetchedFrom": "http://127.0.0.1:19387/dsh-boot-naruto",
+ "manifestTop": {
+  "plugin": "dsh-boot-naruto",
+  "dir": "arts",
+  "exists": true,
+  "log": {
+   "ok": true,
+   "err": null,
+   "degraded": false,
+   "path": "~\\.dsh\\boot-naruto\\boot.log",
+   "fallback": "~\\AppData\\Local\\Temp\\boot-naruto-trace.log",
+   "via": "~\\.dsh\\boot-naruto\\boot.log",
+   "dshHomeSet": false
+  },
+  "manual": true,
+  "selected": "tobirama-night",
+  "count": 18,
+  "usable": 17,
+  "maxActs": 8
+ },
+ "presets": [
+  {
+   "id": "tobirama-night",
+   "title": "永夜 · 扉间",
+   "open": "none",
+   "acts": 4,
+   "bytes": 953771,
+   "mtime": 1795100869520,
+   "ok": true,
+   "error": "",
+   "version": "s3c5t1a1f4598390",
+   "url": "/dsh-boot-naruto/arts/tobirama-night/preset.json?v=s3c5t1a1f4598390",
+   "files": [
+    {
+     "name": "01.jpg",
+     "bytes": 245016,
+     "version": "s3bd18t1a1d8d6e1c0",
+     "url": "/dsh-boot-naruto/arts/tobirama-night/01.jpg?v=s3bd18t1a1d8d6e1c0"
+    },
+    {
+     "name": "02.jpg",
+     "bytes": 332851,
+     "version": "s51433t1a1d8d6e293",
+     "url": "/dsh-boot-naruto/arts/tobirama-night/02.jpg?v=s51433t1a1d8d6e293"
+    },
+    {
+     "name": "03.jpg",
+     "bytes": 207614,
+     "version": "s32afet1a1d8d6e358",
+     "url": "/dsh-boot-naruto/arts/tobirama-night/03.jpg?v=s32afet1a1d8d6e358"
+    },
+    {
+     "name": "04.jpg",
+     "bytes": 151866,
+     "version": "s2513at1a1d8d6e426",
+     "url": "/dsh-boot-naruto/arts/tobirama-night/04.jpg?v=s2513at1a1d8d6e426"
+    },
+    {
+     "name": "kunai.png",
+     "bytes": 15459,
+     "version": "s3c63t1a1d9eedf07",
+     "url": "/dsh-boot-naruto/arts/tobirama-night/kunai.png?v=s3c63t1a1d9eedf07"
+    }
+   ]
+  },
+  {
+   "id": "danzo",
+   "title": "漂泊 · 团藏",
+   "open": "none",
+   "acts": 5,
+   "bytes": 837212,
+   "mtime": 1795015246375,
+   "ok": true,
+   "error": "",
+   "version": "s46at1a1bc07ba62",
+   "url": "/dsh-boot-naruto/arts/danzo/preset.json?v=s46at1a1bc07ba62",
+   "files": [
+    {
+     "name": "01.jpg",
+     "bytes": 133619,
+     "version": "s209f3t1a1bbe53cc8",
+     "url": "/dsh-boot-naruto/arts/danzo/01.jpg?v=s209f3t1a1bbe53cc8"
+    },
+    {
+     "name": "02.jpg",
+     "bytes": 170978,
+     "version": "s29be2t1a1bbe53f63",
+     "url": "/dsh-boot-naruto/arts/danzo/02.jpg?v=s29be2t1a1bbe53f63"
+    },
+    {
+     "name": "03.jpg",
+     "bytes": 148537,
+     "version": "s24439t1a1bbe5421f",
+     "url": "/dsh-boot-naruto/arts/danzo/03.jpg?v=s24439t1a1bbe5421f"
+    },
+    {
+     "name": "04.jpg",
+     "bytes": 208926,
+     "version": "s3301et1a1bbe54501",
+     "url": "/dsh-boot-naruto/arts/danzo/04.jpg?v=s3301et1a1bbe54501"
+    },
+    {
+     "name": "05.jpg",
+     "bytes": 117493,
+     "version": "s1caf5t1a1bbe5463e",
+     "url": "/dsh-boot-naruto/arts/danzo/05.jpg?v=s1caf5t1a1bbe5463e"
+    },
+    {
+     "name": "eye.png",
+     "bytes": 56529,
+     "version": "sdcd1t1a1ef3f0227",
+     "url": "/dsh-boot-naruto/arts/danzo/eye.png?v=sdcd1t1a1ef3f0227"
+    }
+   ]
+  },
+  {
+   "id": "madara-god",
+   "title": "神驹 · 斑",
+   "open": "akatsuki-cloud",
+   "acts": 3,
+   "bytes": 607250,
+   "mtime": 1795009387300,
+   "ok": true,
+   "error": "",
+   "version": "s2e0t1a1df191ef0",
+   "url": "/dsh-boot-naruto/arts/madara-god/preset.json?v=s2e0t1a1df191ef0",
+   "files": [
+    {
+     "name": "01.jpg",
+     "bytes": 192646,
+     "version": "s2f086t1a1bbe4f847",
+     "url": "/dsh-boot-naruto/arts/madara-god/01.jpg?v=s2f086t1a1bbe4f847"
+    },
+    {
+     "name": "02.jpg",
+     "bytes": 124278,
+     "version": "s1e576t1a1bbe4f980",
+     "url": "/dsh-boot-naruto/arts/madara-god/02.jpg?v=s1e576t1a1bbe4f980"
+    },
+    {
+     "name": "03.jpg",
+     "bytes": 220811,
+     "version": "s35e8bt1a1bbe4fc3a",
+     "url": "/dsh-boot-naruto/arts/madara-god/03.jpg?v=s35e8bt1a1bbe4fc3a"
+    },
+    {
+     "name": "eye.png",
+     "bytes": 68779,
+     "version": "s10cabt1a1eee59b24",
+     "url": "/dsh-boot-naruto/arts/madara-god/eye.png?v=s10cabt1a1eee59b24"
+    }
+   ]
+  },
+  {
+   "id": "kakashi",
+   "title": "须佐 · 卡卡西",
+   "open": "none",
+   "acts": 4,
+   "bytes": 708376,
+   "mtime": 1795009387282,
+   "ok": true,
+   "error": "",
+   "version": "s3adt1a1bc07ba99",
+   "url": "/dsh-boot-naruto/arts/kakashi/preset.json?v=s3adt1a1bc07ba99",
+   "files": [
+    {
+     "name": "01.jpg",
+     "bytes": 177124,
+     "version": "s2b3e4t1a1bbe5080a",
+     "url": "/dsh-boot-naruto/arts/kakashi/01.jpg?v=s2b3e4t1a1bbe5080a"
+    },
+    {
+     "name": "02.jpg",
+     "bytes": 169208,
+     "version": "s294f8t1a1bbe50aed",
+     "url": "/dsh-boot-naruto/arts/kakashi/02.jpg?v=s294f8t1a1bbe50aed"
+    },
+    {
+     "name": "03.jpg",
+     "bytes": 112731,
+     "version": "s1b85bt1a1bbe50de1",
+     "url": "/dsh-boot-naruto/arts/kakashi/03.jpg?v=s1b85bt1a1bbe50de1"
+    },
+    {
+     "name": "04.jpg",
+     "bytes": 184057,
+     "version": "s2cef9t1a1bbe5111d",
+     "url": "/dsh-boot-naruto/arts/kakashi/04.jpg?v=s2cef9t1a1bbe5111d"
+    },
+    {
+     "name": "eye.png",
+     "bytes": 64315,
+     "version": "sfb3bt1a1eee59b12",
+     "url": "/dsh-boot-naruto/arts/kakashi/eye.png?v=sfb3bt1a1eee59b12"
+    }
+   ]
+  },
+  {
+   "id": "brothers",
+   "title": "兄弟之战",
+   "open": "akatsuki-cloud",
+   "acts": 3,
+   "bytes": 443868,
+   "mtime": 1795009387262,
+   "ok": true,
+   "error": "",
+   "version": "s2f0t1a1bc07ba57",
+   "url": "/dsh-boot-naruto/arts/brothers/preset.json?v=s2f0t1a1bc07ba57",
+   "files": [
+    {
+     "name": "01.jpg",
+     "bytes": 95715,
+     "version": "s175e3t1a1bbe4deb7",
+     "url": "/dsh-boot-naruto/arts/brothers/01.jpg?v=s175e3t1a1bbe4deb7"
+    },
+    {
+     "name": "02.jpg",
+     "bytes": 124691,
+     "version": "s1e713t1a1bbe4dfe8",
+     "url": "/dsh-boot-naruto/arts/brothers/02.jpg?v=s1e713t1a1bbe4dfe8"
+    },
+    {
+     "name": "03.jpg",
+     "bytes": 163865,
+     "version": "s28019t1a1bbe4e23a",
+     "url": "/dsh-boot-naruto/arts/brothers/03.jpg?v=s28019t1a1bbe4e23a"
+    },
+    {
+     "name": "eye.png",
+     "bytes": 58845,
+     "version": "se5ddt1a1eee59afe",
+     "url": "/dsh-boot-naruto/arts/brothers/eye.png?v=se5ddt1a1eee59afe"
+    }
+   ]
+  },
+  {
+   "id": "hashirama",
+   "title": "侠隐 · 柱间",
+   "open": "none",
+   "acts": 4,
+   "bytes": 813354,
+   "mtime": 1795009387116,
+   "ok": true,
+   "error": "",
+   "version": "s39bt1a1bc07ba78",
+   "url": "/dsh-boot-naruto/arts/hashirama/preset.json?v=s39bt1a1bc07ba78",
+   "files": [
+    {
+     "name": "01.jpg",
+     "bytes": 190439,
+     "version": "s2e7e7t1a1bbe4fecd",
+     "url": "/dsh-boot-naruto/arts/hashirama/01.jpg?v=s2e7e7t1a1bbe4fecd"
+    },
+    {
+     "name": "02.jpg",
+     "bytes": 274720,
+     "version": "s43120t1a1bbe5018d",
+     "url": "/dsh-boot-naruto/arts/hashirama/02.jpg?v=s43120t1a1bbe5018d"
+    },
+    {
+     "name": "03.jpg",
+     "bytes": 95597,
+     "version": "s1756dt1a1bbe502b7",
+     "url": "/dsh-boot-naruto/arts/hashirama/03.jpg?v=s1756dt1a1bbe502b7"
+    },
+    {
+     "name": "04.jpg",
+     "bytes": 237137,
+     "version": "s39e51t1a1bbe50557",
+     "url": "/dsh-boot-naruto/arts/hashirama/04.jpg?v=s39e51t1a1bbe50557"
+    },
+    {
+     "name": "eye.png",
+     "bytes": 14538,
+     "version": "s38cat1a1eee59a6c",
+     "url": "/dsh-boot-naruto/arts/hashirama/eye.png?v=s38cat1a1eee59a6c"
+    }
+   ]
+  },
+  {
+   "id": "tsunade",
+   "title": "侠隐 · 纲手",
+   "open": "none",
+   "acts": 4,
+   "bytes": 635359,
+   "mtime": 1795009387071,
+   "ok": true,
+   "error": "",
+   "version": "s397t1a1bc07baf6",
+   "url": "/dsh-boot-naruto/arts/tsunade/preset.json?v=s397t1a1bc07baf6",
+   "files": [
+    {
+     "name": "01.jpg",
+     "bytes": 156570,
+     "version": "s2639at1a1bbe54f2a",
+     "url": "/dsh-boot-naruto/arts/tsunade/01.jpg?v=s2639at1a1bbe54f2a"
+    },
+    {
+     "name": "02.jpg",
+     "bytes": 130481,
+     "version": "s1fdb1t1a1bbe552c4",
+     "url": "/dsh-boot-naruto/arts/tsunade/02.jpg?v=s1fdb1t1a1bbe552c4"
+    },
+    {
+     "name": "03.jpg",
+     "bytes": 162475,
+     "version": "s27aabt1a1bbe55437",
+     "url": "/dsh-boot-naruto/arts/tsunade/03.jpg?v=s27aabt1a1bbe55437"
+    },
+    {
+     "name": "04.jpg",
+     "bytes": 170376,
+     "version": "s29988t1a1bbe556a6",
+     "url": "/dsh-boot-naruto/arts/tsunade/04.jpg?v=s29988t1a1bbe556a6"
+    },
+    {
+     "name": "eye.png",
+     "bytes": 14538,
+     "version": "s38cat1a1eee59a3f",
+     "url": "/dsh-boot-naruto/arts/tsunade/eye.png?v=s38cat1a1eee59a3f"
+    }
+   ]
+  },
+  {
+   "id": "sasuke",
+   "title": "侠隐 · 佐助",
+   "open": "akatsuki-cloud",
+   "acts": 5,
+   "bytes": 673501,
+   "mtime": 1795009386997,
+   "ok": true,
+   "error": "",
+   "version": "s477t1a1bc07bad7",
+   "url": "/dsh-boot-naruto/arts/sasuke/preset.json?v=s477t1a1bc07bad7",
+   "files": [
+    {
+     "name": "01.jpg",
+     "bytes": 94993,
+     "version": "s17311t1a1bbe4e373",
+     "url": "/dsh-boot-naruto/arts/sasuke/01.jpg?v=s17311t1a1bbe4e373"
+    },
+    {
+     "name": "02.jpg",
+     "bytes": 150747,
+     "version": "s24cdbt1a1bbe4e61c",
+     "url": "/dsh-boot-naruto/arts/sasuke/02.jpg?v=s24cdbt1a1bbe4e61c"
+    },
+    {
+     "name": "03.jpg",
+     "bytes": 100513,
+     "version": "s188a1t1a1bbe4e8f6",
+     "url": "/dsh-boot-naruto/arts/sasuke/03.jpg?v=s188a1t1a1bbe4e8f6"
+    },
+    {
+     "name": "04.jpg",
+     "bytes": 142288,
+     "version": "s22bd0t1a1bbe4eb97",
+     "url": "/dsh-boot-naruto/arts/sasuke/04.jpg?v=s22bd0t1a1bbe4eb97"
+    },
+    {
+     "name": "05.jpg",
+     "bytes": 110173,
+     "version": "s1ae5dt1a1bbe4ed06",
+     "url": "/dsh-boot-naruto/arts/sasuke/05.jpg?v=s1ae5dt1a1bbe4ed06"
+    },
+    {
+     "name": "eye.png",
+     "bytes": 73644,
+     "version": "s11fact1a1eee599f5",
+     "url": "/dsh-boot-naruto/arts/sasuke/eye.png?v=s11fact1a1eee599f5"
+    }
+   ]
+  },
+  {
+   "id": "itachi",
+   "title": "晓 · 鼬",
+   "open": "akatsuki-cloud",
+   "acts": 4,
+   "bytes": 648149,
+   "mtime": 1795009386939,
+   "ok": true,
+   "error": "",
+   "version": "s3b7t1a1c03002ec",
+   "url": "/dsh-boot-naruto/arts/itachi/preset.json?v=s3b7t1a1c03002ec",
+   "files": [
+    {
+     "name": "01.jpg",
+     "bytes": 176733,
+     "version": "s2b25dt1a1bbe4d78e",
+     "url": "/dsh-boot-naruto/arts/itachi/01.jpg?v=s2b25dt1a1bbe4d78e"
+    },
+    {
+     "name": "02.jpg",
+     "bytes": 116428,
+     "version": "s1c6cct1a1bbe4d8cc",
+     "url": "/dsh-boot-naruto/arts/itachi/02.jpg?v=s1c6cct1a1bbe4d8cc"
+    },
+    {
+     "name": "03.jpg",
+     "bytes": 126662,
+     "version": "s1eec6t1a1c02f6586",
+     "url": "/dsh-boot-naruto/arts/itachi/03.jpg?v=s1eec6t1a1c02f6586"
+    },
+    {
+     "name": "04.jpg",
+     "bytes": 154970,
+     "version": "s25d5at1a1bbe4dd7d",
+     "url": "/dsh-boot-naruto/arts/itachi/04.jpg?v=s25d5at1a1bbe4dd7d"
+    },
+    {
+     "name": "eye.png",
+     "bytes": 72405,
+     "version": "s11ad5t1a1eee599bb",
+     "url": "/dsh-boot-naruto/arts/itachi/eye.png?v=s11ad5t1a1eee599bb"
+    }
+   ]
+  },
+  {
+   "id": "toneri",
+   "title": "最终章 · 舍人",
+   "open": "none",
+   "acts": 3,
+   "bytes": 472404,
+   "mtime": 1794662408048,
+   "ok": true,
+   "error": "",
+   "version": "s31ct1a1da371f70",
+   "url": "/dsh-boot-naruto/arts/toneri/preset.json?v=s31ct1a1da371f70",
+   "files": [
+    {
+     "name": "01.jpg",
+     "bytes": 168013,
+     "version": "s2904dt1a1da371f6f",
+     "url": "/dsh-boot-naruto/arts/toneri/01.jpg?v=s2904dt1a1da371f6f"
+    },
+    {
+     "name": "02.jpg",
+     "bytes": 143243,
+     "version": "s22f8bt1a1bbe52af6",
+     "url": "/dsh-boot-naruto/arts/toneri/02.jpg?v=s22f8bt1a1bbe52af6"
+    },
+    {
+     "name": "03.jpg",
+     "bytes": 160352,
+     "version": "s27260t1a1bbe52db8",
+     "url": "/dsh-boot-naruto/arts/toneri/03.jpg?v=s27260t1a1bbe52db8"
+    }
+   ]
+  },
+  {
+   "id": "minato",
+   "title": "侠隐 · 水门",
+   "open": "none",
+   "acts": 5,
+   "bytes": 953767,
+   "mtime": 1794657672967,
+   "ok": true,
+   "error": "",
+   "version": "s454t1a1bc07bacd",
+   "url": "/dsh-boot-naruto/arts/minato/preset.json?v=s454t1a1bc07bacd",
+   "files": [
+    {
+     "name": "01.jpg",
+     "bytes": 219502,
+     "version": "s3596et1a1bbe530cd",
+     "url": "/dsh-boot-naruto/arts/minato/01.jpg?v=s3596et1a1bbe530cd"
+    },
+    {
+     "name": "02.jpg",
+     "bytes": 183969,
+     "version": "s2cea1t1a1bbe533a8",
+     "url": "/dsh-boot-naruto/arts/minato/02.jpg?v=s2cea1t1a1bbe533a8"
+    },
+    {
+     "name": "03.jpg",
+     "bytes": 235049,
+     "version": "s39629t1a1bbe536b9",
+     "url": "/dsh-boot-naruto/arts/minato/03.jpg?v=s39629t1a1bbe536b9"
+    },
+    {
+     "name": "04.jpg",
+     "bytes": 136869,
+     "version": "s216a5t1a1bbe5381e",
+     "url": "/dsh-boot-naruto/arts/minato/04.jpg?v=s216a5t1a1bbe5381e"
+    },
+    {
+     "name": "05.jpg",
+     "bytes": 161811,
+     "version": "s27813t1a1bbe539bf",
+     "url": "/dsh-boot-naruto/arts/minato/05.jpg?v=s27813t1a1bbe539bf"
+    },
+    {
+     "name": "kunai.png",
+     "bytes": 15459,
+     "version": "s3c63t1a1d9eedf07",
+     "url": "/dsh-boot-naruto/arts/minato/kunai.png?v=s3c63t1a1d9eedf07"
+    }
+   ]
+  },
+  {
+   "id": "tobirama",
+   "title": "漂泊 · 扉间",
+   "open": "none",
+   "acts": 4,
+   "bytes": 879411,
+   "mtime": 1794657672967,
+   "ok": true,
+   "error": "",
+   "version": "s3a8t1a1bc07bae2",
+   "url": "/dsh-boot-naruto/arts/tobirama/preset.json?v=s3a8t1a1bc07bae2",
+   "files": [
+    {
+     "name": "01.jpg",
+     "bytes": 196956,
+     "version": "s3015ct1a1bbe547c4",
+     "url": "/dsh-boot-naruto/arts/tobirama/01.jpg?v=s3015ct1a1bbe547c4"
+    },
+    {
+     "name": "02.jpg",
+     "bytes": 262147,
+     "version": "s40003t1a1bbe5495e",
+     "url": "/dsh-boot-naruto/arts/tobirama/02.jpg?v=s40003t1a1bbe5495e"
+    },
+    {
+     "name": "03.jpg",
+     "bytes": 203708,
+     "version": "s31bbct1a1bbe54afc",
+     "url": "/dsh-boot-naruto/arts/tobirama/03.jpg?v=s31bbct1a1bbe54afc"
+    },
+    {
+     "name": "04.jpg",
+     "bytes": 200205,
+     "version": "s30e0dt1a1bbe54ca0",
+     "url": "/dsh-boot-naruto/arts/tobirama/04.jpg?v=s30e0dt1a1bbe54ca0"
+    },
+    {
+     "name": "kunai.png",
+     "bytes": 15459,
+     "version": "s3c63t1a1d9eedf07",
+     "url": "/dsh-boot-naruto/arts/tobirama/kunai.png?v=s3c63t1a1d9eedf07"
+    }
+   ]
+  },
+  {
+   "id": "madara",
+   "title": "宇智波 · 斑",
+   "open": "akatsuki-cloud",
+   "acts": 4,
+   "bytes": 581024,
+   "mtime": 1794155985591,
+   "ok": true,
+   "error": "",
+   "version": "s3b6t1a1bc07bab7",
+   "url": "/dsh-boot-naruto/arts/madara/preset.json?v=s3b6t1a1bc07bab7",
+   "files": [
+    {
+     "name": "01.jpg",
+     "bytes": 217501,
+     "version": "s3519dt1a1bbe4eecc",
+     "url": "/dsh-boot-naruto/arts/madara/01.jpg?v=s3519dt1a1bbe4eecc"
+    },
+    {
+     "name": "02.jpg",
+     "bytes": 119471,
+     "version": "s1d2aft1a1bbe4f174",
+     "url": "/dsh-boot-naruto/arts/madara/02.jpg?v=s1d2aft1a1bbe4f174"
+    },
+    {
+     "name": "03.jpg",
+     "bytes": 115538,
+     "version": "s1c352t1a1bbe4f40b",
+     "url": "/dsh-boot-naruto/arts/madara/03.jpg?v=s1c352t1a1bbe4f40b"
+    },
+    {
+     "name": "04.jpg",
+     "bytes": 127564,
+     "version": "s1f24ct1a1bbe4f599",
+     "url": "/dsh-boot-naruto/arts/madara/04.jpg?v=s1f24ct1a1bbe4f599"
+    }
+   ]
+  },
+  {
+   "id": "konan",
+   "title": "晓 · 小南",
+   "open": "akatsuki-cloud",
+   "acts": 6,
+   "bytes": 988834,
+   "mtime": 1794155985571,
+   "ok": true,
+   "error": "",
+   "version": "s52ct1a1bc07baa3",
+   "url": "/dsh-boot-naruto/arts/konan/preset.json?v=s52ct1a1bc07baa3",
+   "files": [
+    {
+     "name": "01.jpg",
+     "bytes": 166384,
+     "version": "s289f0t1a1bbe4c8e9",
+     "url": "/dsh-boot-naruto/arts/konan/01.jpg?v=s289f0t1a1bbe4c8e9"
+    },
+    {
+     "name": "02.jpg",
+     "bytes": 158183,
+     "version": "s269e7t1a1bbe4ca4e",
+     "url": "/dsh-boot-naruto/arts/konan/02.jpg?v=s269e7t1a1bbe4ca4e"
+    },
+    {
+     "name": "03.jpg",
+     "bytes": 180338,
+     "version": "s2c072t1a1bbe4ccf2",
+     "url": "/dsh-boot-naruto/arts/konan/03.jpg?v=s2c072t1a1bbe4ccf2"
+    },
+    {
+     "name": "04.jpg",
+     "bytes": 149495,
+     "version": "s247f7t1a1bbe4cf7a",
+     "url": "/dsh-boot-naruto/arts/konan/04.jpg?v=s247f7t1a1bbe4cf7a"
+    },
+    {
+     "name": "05.jpg",
+     "bytes": 163425,
+     "version": "s27e61t1a1bbe4d212",
+     "url": "/dsh-boot-naruto/arts/konan/05.jpg?v=s27e61t1a1bbe4d212"
+    },
+    {
+     "name": "06.jpg",
+     "bytes": 169685,
+     "version": "s296d5t1a1bbe4d4f5",
+     "url": "/dsh-boot-naruto/arts/konan/06.jpg?v=s296d5t1a1bbe4d4f5"
+    }
+   ]
+  },
+  {
+   "id": "hinata",
+   "title": "八极 · 雏田",
+   "open": "none",
+   "acts": 6,
+   "bytes": 1145193,
+   "mtime": 1794155985538,
+   "ok": true,
+   "error": "",
+   "version": "s51ft1a1bc07ba82",
+   "url": "/dsh-boot-naruto/arts/hinata/preset.json?v=s51ft1a1bc07ba82",
+   "files": [
+    {
+     "name": "01.jpg",
+     "bytes": 195363,
+     "version": "s2fb23t1a1bbe5144c",
+     "url": "/dsh-boot-naruto/arts/hinata/01.jpg?v=s2fb23t1a1bbe5144c"
+    },
+    {
+     "name": "02.jpg",
+     "bytes": 213476,
+     "version": "s341e4t1a1bbe51764",
+     "url": "/dsh-boot-naruto/arts/hinata/02.jpg?v=s341e4t1a1bbe51764"
+    },
+    {
+     "name": "03.jpg",
+     "bytes": 196064,
+     "version": "s2fde0t1a1bbe51a5a",
+     "url": "/dsh-boot-naruto/arts/hinata/03.jpg?v=s2fde0t1a1bbe51a5a"
+    },
+    {
+     "name": "04.jpg",
+     "bytes": 204132,
+     "version": "s31d64t1a1bbe51d43",
+     "url": "/dsh-boot-naruto/arts/hinata/04.jpg?v=s31d64t1a1bbe51d43"
+    },
+    {
+     "name": "05.jpg",
+     "bytes": 175462,
+     "version": "s2ad66t1a1bbe51e9e",
+     "url": "/dsh-boot-naruto/arts/hinata/05.jpg?v=s2ad66t1a1bbe51e9e"
+    },
+    {
+     "name": "06.jpg",
+     "bytes": 159385,
+     "version": "s26e99t1a1bbe51ff1",
+     "url": "/dsh-boot-naruto/arts/hinata/06.jpg?v=s26e99t1a1bbe51ff1"
+    }
+   ]
+  },
+  {
+   "id": "hanabi",
+   "title": "武当 · 花火",
+   "open": "none",
+   "acts": 6,
+   "bytes": 1474575,
+   "mtime": 1794155985516,
+   "ok": true,
+   "error": "",
+   "version": "s51dt1a1bc07ba6c",
+   "url": "/dsh-boot-naruto/arts/hanabi/preset.json?v=s51dt1a1bc07ba6c",
+   "files": [
+    {
+     "name": "01.jpg",
+     "bytes": 243462,
+     "version": "s3b706t1a1bbe5599d",
+     "url": "/dsh-boot-naruto/arts/hanabi/01.jpg?v=s3b706t1a1bbe5599d"
+    },
+    {
+     "name": "02.jpg",
+     "bytes": 257251,
+     "version": "s3ece3t1a1bbe55cb6",
+     "url": "/dsh-boot-naruto/arts/hanabi/02.jpg?v=s3ece3t1a1bbe55cb6"
+    },
+    {
+     "name": "03.jpg",
+     "bytes": 275534,
+     "version": "s4344et1a1bbe55f82",
+     "url": "/dsh-boot-naruto/arts/hanabi/03.jpg?v=s4344et1a1bbe55f82"
+    },
+    {
+     "name": "04.jpg",
+     "bytes": 221478,
+     "version": "s36126t1a1bbe56243",
+     "url": "/dsh-boot-naruto/arts/hanabi/04.jpg?v=s36126t1a1bbe56243"
+    },
+    {
+     "name": "05.jpg",
+     "bytes": 286759,
+     "version": "s46027t1a1bbe564c1",
+     "url": "/dsh-boot-naruto/arts/hanabi/05.jpg?v=s46027t1a1bbe564c1"
+    },
+    {
+     "name": "06.jpg",
+     "bytes": 188782,
+     "version": "s2e16et1a1bbe56763",
+     "url": "/dsh-boot-naruto/arts/hanabi/06.jpg?v=s2e16et1a1bbe56763"
+    }
+   ]
+  },
+  {
+   "id": "hinata-last",
+   "title": "最终章 · 雏田",
+   "open": "none",
+   "acts": 3,
+   "bytes": 399936,
+   "mtime": 1794153719565,
+   "ok": true,
+   "error": "",
+   "version": "s297t1a1bbe5270d",
+   "url": "/dsh-boot-naruto/arts/hinata-last/preset.json?v=s297t1a1bbe5270d",
+   "files": [
+    {
+     "name": "01.jpg",
+     "bytes": 171018,
+     "version": "s29c0at1a1bbe52258",
+     "url": "/dsh-boot-naruto/arts/hinata-last/01.jpg?v=s29c0at1a1bbe52258"
+    },
+    {
+     "name": "02.jpg",
+     "bytes": 121328,
+     "version": "s1d9f0t1a1bbe524ba",
+     "url": "/dsh-boot-naruto/arts/hinata-last/02.jpg?v=s1d9f0t1a1bbe524ba"
+    },
+    {
+     "name": "03.jpg",
+     "bytes": 106927,
+     "version": "s1a1aft1a1bbe5270c",
+     "url": "/dsh-boot-naruto/arts/hinata-last/03.jpg?v=s1a1aft1a1bbe5270c"
+    }
+   ]
+  },
+  {
+   "id": "ui",
+   "title": "ui",
+   "open": "none",
+   "acts": 0,
+   "bytes": 0,
+   "mtime": 0,
+   "ok": false,
+   "error": "缺 preset.json",
+   "version": "",
+   "url": "",
+   "files": []
+  }
+ ],
+ "clips": {
+  "plugin": "dsh-boot-naruto",
+  "dir": "clips",
+  "exists": true,
+  "selected": "tobirama-night.mp4",
+  "fit": "cover",
+  "clips": [
+   {
+    "name": "tobirama-night.mp4",
+    "bytes": 12369141,
+    "mtime": 1795100990938,
+    "contentType": "video/mp4",
+    "version": "sbcbcf5t1a1f45b5dda",
+    "faststart": true,
+    "url": "/dsh-boot-naruto/media/tobirama-night.mp4?v=sbcbcf5t1a1f45b5dda"
+   }
+  ]
+ },
+ "docs": {
+  "tobirama-night": {
+   "schema": 1,
+   "id": "tobirama-night",
+   "clip": "tobirama-night.mp4",
+   "title": "永夜 · 扉间",
+   "sub": "TOBIRAMA NIGHT · DSH 开屏动画",
+   "open": "none",
+   "acts": [
+    {
+     "dur": 900,
+     "pos": "52% 48%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "01.jpg",
+     "kb": [
+      "-3% -3%",
+      "-1% -1.5%"
+     ]
+    },
+    {
+     "dur": 850,
+     "pos": "28% 46%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "02.jpg",
+     "kb": [
+      "2% -3%",
+      "-1% -2%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "67% 31%",
+     "z0": 1.14,
+     "z": 1.06,
+     "flash": false,
+     "file": "03.jpg",
+     "kb": [
+      "-4% 2%",
+      "-2% 0%"
+     ]
+    },
+    {
+     "dur": 1100,
+     "pos": "49% 51%",
+     "z0": 1.06,
+     "z": 1.13,
+     "flash": false,
+     "file": "04.jpg",
+     "kb": [
+      "0% 1%",
+      "0% -1%"
+     ]
+    }
+   ]
+  },
+  "danzo": {
+   "schema": 1,
+   "id": "danzo",
+   "title": "漂泊 · 团藏",
+   "sub": "DANZO · DSH 开屏动画",
+   "open": "none",
+   "acts": [
+    {
+     "dur": 900,
+     "pos": "52% 22%",
+     "z0": 1.04,
+     "z": 1.1,
+     "flash": false,
+     "file": "01.jpg",
+     "kb": [
+      "1% 1.92%",
+      "-4% 0%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "49% 43%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "02.jpg",
+     "kb": [
+      "-4% -4%",
+      "0% 2%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "50% 8%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "03.jpg",
+     "kb": [
+      "-4% 4%",
+      "2% 0%"
+     ]
+    },
+    {
+     "dur": 1150,
+     "pos": "51% 45%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "04.jpg",
+     "pupil": "51% 41%",
+     "kb": [
+      "1% -1.46%",
+      "4% 0%"
+     ]
+    },
+    {
+     "dur": 1000,
+     "pos": "47% 52%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "05.jpg",
+     "kb": [
+      "4% 4%",
+      "0% 0%"
+     ]
+    }
+   ]
+  },
+  "madara-god": {
+   "schema": 1,
+   "id": "madara-god",
+   "title": "神驹 · 斑",
+   "sub": "MADARA · DSH 开屏动画",
+   "open": "akatsuki-cloud",
+   "acts": [
+    {
+     "dur": 1167,
+     "pos": "59% 41%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "01.jpg",
+     "kb": [
+      "1% -1%",
+      "-4% 0%"
+     ]
+    },
+    {
+     "dur": 1167,
+     "pos": "56% 48%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "02.jpg",
+     "kb": [
+      "-1.46% -1%",
+      "-4% 0%"
+     ]
+    },
+    {
+     "dur": 1167,
+     "pos": "49% 22%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "03.jpg",
+     "kb": [
+      "-1% 0%",
+      "4% 4%"
+     ]
+    }
+   ]
+  },
+  "kakashi": {
+   "schema": 1,
+   "id": "kakashi",
+   "title": "须佐 · 卡卡西",
+   "sub": "KAKASHI · DSH 开屏动画",
+   "open": "none",
+   "acts": [
+    {
+     "dur": 900,
+     "pos": "49% 48%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "01.jpg",
+     "kb": [
+      "0% -4%",
+      "0% 2%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "55% 8%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "02.jpg",
+     "kb": [
+      "4% 4%",
+      "-2% 0%"
+     ]
+    },
+    {
+     "dur": 800,
+     "pos": "30% 49%",
+     "z0": 1.1,
+     "z": 1.16,
+     "flash": false,
+     "file": "03.jpg",
+     "pupil": "30% 45%",
+     "kb": [
+      "-4% -4%",
+      "4% 4%"
+     ]
+    },
+    {
+     "dur": 1150,
+     "pos": "51% 45%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "04.jpg",
+     "kb": [
+      "1% 1.46%",
+      "0% 0%"
+     ]
+    }
+   ]
+  },
+  "brothers": {
+   "schema": 1,
+   "id": "brothers",
+   "title": "兄弟之战",
+   "sub": "UCHIHA · DSH 开屏动画",
+   "open": "akatsuki-cloud",
+   "acts": [
+    {
+     "dur": 1300,
+     "pos": "44% 56%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "01.jpg",
+     "kb": [
+      "4% 4%",
+      "2.38% 2%"
+     ]
+    },
+    {
+     "dur": 1300,
+     "pos": "34% 48%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "02.jpg",
+     "kb": [
+      "4% 4%",
+      "0% 2%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "50% 44%",
+     "z0": 1.08,
+     "z": 1.2,
+     "kb": [
+      "0% 0%",
+      "0% -3%"
+     ],
+     "flash": false,
+     "pupil": "50% 40%",
+     "file": "03.jpg"
+    }
+   ]
+  },
+  "hashirama": {
+   "schema": 1,
+   "id": "hashirama",
+   "title": "侠隐 · 柱间",
+   "sub": "HASHIRAMA · DSH 开屏动画",
+   "open": "none",
+   "acts": [
+    {
+     "dur": 1150,
+     "pos": "50% 40%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "01.jpg",
+     "kb": [
+      "1% -1.46%",
+      "0% 4%"
+     ]
+    },
+    {
+     "dur": 1150,
+     "pos": "50% 45%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "02.jpg",
+     "kb": [
+      "1% 1.46%",
+      "0% 4%"
+     ]
+    },
+    {
+     "dur": 1150,
+     "pos": "42% 46%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "03.jpg",
+     "kb": [
+      "0% 1%",
+      "0% 4%"
+     ]
+    },
+    {
+     "dur": 1150,
+     "pos": "48% 8%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "04.jpg",
+     "kb": [
+      "1% 1.46%",
+      "0% 0%"
+     ]
+    }
+   ]
+  },
+  "tsunade": {
+   "schema": 1,
+   "id": "tsunade",
+   "title": "侠隐 · 纲手",
+   "sub": "TSUNADE · DSH 开屏动画",
+   "open": "none",
+   "acts": [
+    {
+     "dur": 1150,
+     "pos": "53% 47%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "01.jpg",
+     "kb": [
+      "1% -1%",
+      "-4% 0%"
+     ]
+    },
+    {
+     "dur": 1150,
+     "pos": "31% 46%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "02.jpg",
+     "kb": [
+      "-1.46% 1%",
+      "4% 4%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "75% 46%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "03.jpg",
+     "kb": [
+      "4% 4%",
+      "2.38% 2%"
+     ]
+    },
+    {
+     "dur": 1150,
+     "pos": "57% 46%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "04.jpg",
+     "kb": [
+      "1% 1%",
+      "-4% 4%"
+     ]
+    }
+   ]
+  },
+  "sasuke": {
+   "schema": 1,
+   "id": "sasuke",
+   "title": "侠隐 · 佐助",
+   "sub": "SASUKE · DSH 开屏动画",
+   "open": "akatsuki-cloud",
+   "acts": [
+    {
+     "dur": 900,
+     "pos": "25% 46%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "01.jpg",
+     "kb": [
+      "-4% 4%",
+      "2.38% 0%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "51% 50%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "02.jpg",
+     "kb": [
+      "4% 4%",
+      "-2% 0%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "45% 50%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "03.jpg",
+     "kb": [
+      "-4% 4%",
+      "2% 0%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "49% 50%",
+     "z0": 1.12,
+     "z": 1.02,
+     "flash": false,
+     "file": "04.jpg",
+     "kb": [
+      "4% 4%",
+      "0% 0%"
+     ]
+    },
+    {
+     "dur": 1000,
+     "pos": "56% 50%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "05.jpg",
+     "pupil": "56% 46%",
+     "kb": [
+      "4% 4%",
+      "-2.38% -2%"
+     ]
+    }
+   ]
+  },
+  "itachi": {
+   "schema": 1,
+   "id": "itachi",
+   "title": "晓 · 鼬",
+   "sub": "AKATSUKI · DSH 开屏动画",
+   "open": "akatsuki-cloud",
+   "acts": [
+    {
+     "dur": 1150,
+     "pos": "50% 50%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "01.jpg",
+     "kb": [
+      "-1% -1%",
+      "4% -4%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "53% 49%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "02.jpg",
+     "kb": [
+      "4% -4%",
+      "-2.38% 0%"
+     ]
+    },
+    {
+     "dur": 850,
+     "pos": "50% 50%",
+     "z0": 1.13,
+     "z": 1.06,
+     "kb": [
+      "-4% 0%",
+      "2% -1%"
+     ],
+     "flash": false,
+     "pupil": "50% 24%",
+     "file": "03.jpg"
+    },
+    {
+     "dur": 1000,
+     "pos": "50% 22%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "04.jpg",
+     "kb": [
+      "4% -4%",
+      "2% 2.38%"
+     ]
+    }
+   ]
+  },
+  "toneri": {
+   "schema": 1,
+   "id": "toneri",
+   "title": "最终章 · 舍人",
+   "sub": "TORUNEI · DSH 开屏动画",
+   "open": "none",
+   "acts": [
+    {
+     "dur": 1125,
+     "pos": "50% 30%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "01.jpg",
+     "kb": [
+      "-4% 4%",
+      "2.38% 0%"
+     ]
+    },
+    {
+     "dur": 1125,
+     "pos": "51% 22%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "02.jpg",
+     "pupil": "51% 18%",
+     "kb": [
+      "4% 4%",
+      "2% 2.38%"
+     ]
+    },
+    {
+     "dur": 1250,
+     "pos": "49% 56%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": true,
+     "file": "03.jpg",
+     "kb": [
+      "4% 4%",
+      "0% 0%"
+     ]
+    }
+   ]
+  },
+  "minato": {
+   "schema": 1,
+   "id": "minato",
+   "title": "侠隐 · 水门",
+   "sub": "MINATO · DSH 开屏动画",
+   "open": "none",
+   "acts": [
+    {
+     "dur": 900,
+     "pos": "49% 22%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "01.jpg",
+     "kb": [
+      "4% -4%",
+      "0% 2.38%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "53% 22%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "02.jpg",
+     "kb": [
+      "4% 4%",
+      "2% 2.38%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "51% 8%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "03.jpg",
+     "kb": [
+      "4% 4%",
+      "2% 2.38%"
+     ]
+    },
+    {
+     "dur": 1150,
+     "pos": "27% 47%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "04.jpg",
+     "kb": [
+      "1.46% 1%",
+      "4% 4%"
+     ]
+    },
+    {
+     "dur": 800,
+     "pos": "44% 49%",
+     "z0": 1.14,
+     "z": 1.06,
+     "flash": false,
+     "file": "05.jpg",
+     "kb": [
+      "4% 4%",
+      "0% 2%"
+     ]
+    }
+   ]
+  },
+  "tobirama": {
+   "schema": 1,
+   "id": "tobirama",
+   "title": "漂泊 · 扉间",
+   "sub": "TOBIRAMA · DSH 开屏动画",
+   "open": "none",
+   "acts": [
+    {
+     "dur": 900,
+     "pos": "51% 22%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "01.jpg",
+     "kb": [
+      "-4% -4%",
+      "-2% -2.38%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "54% 22%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "02.jpg",
+     "kb": [
+      "-4% -4%",
+      "-2% -2.38%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "51% 22%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "03.jpg",
+     "kb": [
+      "-4% -4%",
+      "-2% -2.38%"
+     ]
+    },
+    {
+     "dur": 800,
+     "pos": "49% 45%",
+     "z0": 1.14,
+     "z": 1.06,
+     "flash": false,
+     "file": "04.jpg",
+     "kb": [
+      "-4% -4%",
+      "-2% -2.83%"
+     ]
+    }
+   ]
+  },
+  "madara": {
+   "schema": 1,
+   "id": "madara",
+   "title": "宇智波 · 斑",
+   "sub": "MADARA · DSH 开屏动画",
+   "open": "akatsuki-cloud",
+   "acts": [
+    {
+     "dur": 900,
+     "pos": "48% 8%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "01.jpg",
+     "kb": [
+      "-4% -4%",
+      "2% 0%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "49% 22%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "02.jpg",
+     "kb": [
+      "4% 4%",
+      "-2% 2.38%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "53% 8%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "03.jpg",
+     "kb": [
+      "-4% 4%",
+      "2% -2.38%"
+     ]
+    },
+    {
+     "dur": 800,
+     "pos": "52% 41%",
+     "z0": 1.1,
+     "z": 1.16,
+     "flash": false,
+     "file": "04.jpg",
+     "pupil": "52% 37%",
+     "kb": [
+      "4% -4%",
+      "-4% 4%"
+     ]
+    }
+   ]
+  },
+  "konan": {
+   "schema": 1,
+   "id": "konan",
+   "title": "晓 · 小南",
+   "sub": "AKATSUKI · DSH 开屏动画",
+   "open": "akatsuki-cloud",
+   "acts": [
+    {
+     "dur": 1250,
+     "pos": "62% 22%",
+     "z0": 1.16,
+     "z": 1.05,
+     "kb": [
+      "4% 5%",
+      "-2.38% -2.38%"
+     ],
+     "flash": false,
+     "file": "01.jpg"
+    },
+    {
+     "dur": 849,
+     "pos": "46% 49%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "02.jpg",
+     "kb": [
+      "-4% -4%",
+      "-2.38% 2%"
+     ]
+    },
+    {
+     "dur": 849,
+     "pos": "50% 41%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "03.jpg",
+     "kb": [
+      "-4% 4%",
+      "-2% 2%"
+     ]
+    },
+    {
+     "dur": 1084,
+     "pos": "48% 40%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "04.jpg",
+     "kb": [
+      "-1% 1.46%",
+      "4% 4%"
+     ]
+    },
+    {
+     "dur": 1084,
+     "pos": "49% 39%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "05.jpg",
+     "kb": [
+      "1% 1.46%",
+      "4% 4%"
+     ]
+    },
+    {
+     "dur": 1084,
+     "pos": "53% 49%",
+     "z0": 1.06,
+     "z": 1.16,
+     "flash": false,
+     "file": "06.jpg",
+     "kb": [
+      "2.83% 2%",
+      "0% 0%"
+     ]
+    }
+   ]
+  },
+  "hinata": {
+   "schema": 1,
+   "id": "hinata",
+   "title": "八极 · 雏田",
+   "sub": "HINATA · DSH 开屏动画",
+   "open": "none",
+   "acts": [
+    {
+     "dur": 1150,
+     "pos": "52% 39%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "01.jpg",
+     "kb": [
+      "1% -1.46%",
+      "4% 0%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "53% 22%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "02.jpg",
+     "kb": [
+      "4% -4%",
+      "0% 2.38%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "53% 50%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "03.jpg",
+     "kb": [
+      "4% 4%",
+      "-2% 2%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "54% 49%",
+     "z0": 1.14,
+     "z": 1.06,
+     "flash": false,
+     "file": "04.jpg",
+     "kb": [
+      "-4% 4%",
+      "2.83% 0%"
+     ]
+    },
+    {
+     "dur": 1150,
+     "pos": "47% 51%",
+     "z0": 1.12,
+     "z": 1.02,
+     "flash": false,
+     "file": "05.jpg",
+     "kb": [
+      "4% -4%",
+      "-0.98% 0%"
+     ]
+    },
+    {
+     "dur": 1150,
+     "pos": "54% 50%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "06.jpg",
+     "kb": [
+      "-1.46% 1%",
+      "4% 0%"
+     ]
+    }
+   ]
+  },
+  "hanabi": {
+   "schema": 1,
+   "id": "hanabi",
+   "title": "武当 · 花火",
+   "sub": "HANABI · DSH 开屏动画",
+   "open": "none",
+   "acts": [
+    {
+     "dur": 1000,
+     "pos": "49% 45%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "01.jpg",
+     "kb": [
+      "-1% 1.46%",
+      "-4% 4%"
+     ]
+    },
+    {
+     "dur": 900,
+     "pos": "51% 40%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "02.jpg",
+     "kb": [
+      "-4% 4%",
+      "-2% -2.38%"
+     ]
+    },
+    {
+     "dur": 1150,
+     "pos": "53% 52%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "03.jpg",
+     "kb": [
+      "-1% -1%",
+      "-4% -4%"
+     ]
+    },
+    {
+     "dur": 1150,
+     "pos": "48% 49%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "04.jpg",
+     "kb": [
+      "-1% -1.46%",
+      "0% 4%"
+     ]
+    },
+    {
+     "dur": 800,
+     "pos": "51% 49%",
+     "z0": 1.14,
+     "z": 1.06,
+     "flash": false,
+     "file": "05.jpg",
+     "kb": [
+      "0% 4%",
+      "0% 2%"
+     ]
+    },
+    {
+     "dur": 1000,
+     "pos": "51% 8%",
+     "z0": 1.14,
+     "z": 1.05,
+     "flash": false,
+     "file": "06.jpg",
+     "kb": [
+      "4% 4%",
+      "0% 0%"
+     ]
+    }
+   ]
+  },
+  "hinata-last": {
+   "schema": 1,
+   "id": "hinata-last",
+   "title": "最终章 · 雏田",
+   "sub": "THE LAST · DSH 开屏动画",
+   "open": "none",
+   "acts": [
+    {
+     "dur": 1296,
+     "pos": "45% 50%",
+     "z0": 1.03,
+     "z": 1.16,
+     "flash": false,
+     "file": "01.jpg",
+     "kb": [
+      "-1% -1%",
+      "4% -4%"
+     ]
+    },
+    {
+     "dur": 1167,
+     "pos": "46% 50%",
+     "z0": 1.04,
+     "z": 1.1,
+     "flash": false,
+     "file": "02.jpg",
+     "kb": [
+      "1% -1%",
+      "-4% 0%"
+     ]
+    },
+    {
+     "dur": 1037,
+     "pos": "55% 53%",
+     "z0": 1.14,
+     "z": 1.06,
+     "flash": false,
+     "file": "03.jpg",
+     "kb": [
+      "-4% -4%",
+      "2% -2%"
+     ]
+    }
+   ]
+  }
+ }
+}

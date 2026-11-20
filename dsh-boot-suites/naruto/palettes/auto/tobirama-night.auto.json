@@ -1,0 +1,152 @@
+{
+  "_generated_by": "tools/extract-palette.py v2 -- DO NOT HAND EDIT (每次重跑都被覆盖)",
+  "_tuned_layer": "tuned/<preset>.json  (人工微调写这里,合并时覆盖本文件)",
+  "preset": "tobirama-night",
+  "title": "永夜 · 扉间",
+  "hero": {
+    "file": "04.jpg",
+    "pos": "49% 51%",
+    "eye": null,
+    "acts": 4,
+    "fallback": null,
+    "errors": []
+  },
+  "source": {
+    "image": "04.jpg",
+    "bytes": 151866,
+    "focus_box": [
+      0.6,
+      0.7
+    ]
+  },
+  "ink": {
+    "ground": "#0A1423",
+    "neutral": "#12161D",
+    "accent": "#142D4B",
+    "accent2": "#0B2343",
+    "glow": "#24639B"
+  },
+  "light_derived": {
+    "paper": "#E0EBF9",
+    "paper_2": "#CFDFF1",
+    "paper_3": "#BDD0E7"
+  },
+  "evidence": {
+    "full_frame": {
+      "ground": {
+        "hex": "#0A1423",
+        "h": 216.7,
+        "s": 0.705,
+        "v": 0.137,
+        "lum": 0.074
+      },
+      "accent": {
+        "hex": "#0B234C",
+        "h": 217.7,
+        "s": 0.852,
+        "v": 0.297,
+        "lum": 0.129
+      },
+      "accent2": {
+        "hex": "#0C2244",
+        "h": 215.7,
+        "s": 0.823,
+        "v": 0.265,
+        "lum": 0.126
+      },
+      "neutral": {
+        "hex": "#12161D",
+        "h": 219.0,
+        "s": 0.37,
+        "v": 0.114,
+        "lum": 0.085
+      },
+      "glow": null
+    },
+    "focus_crop": {
+      "ground": {
+        "hex": "#142D4B",
+        "h": 212.9,
+        "s": 0.729,
+        "v": 0.293,
+        "lum": 0.164
+      },
+      "accent": {
+        "hex": "#142D4B",
+        "h": 212.9,
+        "s": 0.729,
+        "v": 0.293,
+        "lum": 0.164
+      },
+      "accent2": {
+        "hex": "#0B2343",
+        "h": 214.4,
+        "s": 0.831,
+        "v": 0.263,
+        "lum": 0.127
+      },
+      "neutral": {
+        "hex": "#090A0E",
+        "h": 232.0,
+        "s": 0.366,
+        "v": 0.055,
+        "lum": 0.038
+      },
+      "glow": {
+        "hex": "#24639B",
+        "h": 208.5,
+        "s": 0.765,
+        "v": 0.609,
+        "lum": 0.352
+      }
+    },
+    "avg_lum": 0.186,
+    "bright_share": 0.0368,
+    "focus_avg_lum": 0.26,
+    "distinct_colors": 54
+  },
+  "top6_full": [
+    {
+      "hex": "#0A1423",
+      "share": 0.0604,
+      "h": 216.7,
+      "s": 0.705,
+      "v": 0.137
+    },
+    {
+      "hex": "#060B13",
+      "share": 0.0559,
+      "h": 217.8,
+      "s": 0.712,
+      "v": 0.076
+    },
+    {
+      "hex": "#0A111D",
+      "share": 0.0453,
+      "h": 216.3,
+      "s": 0.662,
+      "v": 0.114
+    },
+    {
+      "hex": "#121924",
+      "share": 0.0295,
+      "h": 214.7,
+      "s": 0.501,
+      "v": 0.141
+    },
+    {
+      "hex": "#060D1A",
+      "share": 0.026,
+      "h": 218.3,
+      "s": 0.78,
+      "v": 0.104
+    },
+    {
+      "hex": "#121D2B",
+      "share": 0.022,
+      "h": 214.7,
+      "s": 0.572,
+      "v": 0.168
+    }
+  ]
+}

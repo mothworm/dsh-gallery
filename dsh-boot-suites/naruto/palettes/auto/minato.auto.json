@@ -1,0 +1,158 @@
+{
+  "_generated_by": "tools/extract-palette.py v2 -- DO NOT HAND EDIT (每次重跑都被覆盖)",
+  "_tuned_layer": "tuned/<preset>.json  (人工微调写这里,合并时覆盖本文件)",
+  "preset": "minato",
+  "title": "侠隐 · 水门",
+  "hero": {
+    "file": "05.jpg",
+    "pos": "44% 49%",
+    "eye": null,
+    "acts": 5,
+    "fallback": null,
+    "errors": []
+  },
+  "source": {
+    "image": "05.jpg",
+    "bytes": 161811,
+    "focus_box": [
+      0.6,
+      0.7
+    ]
+  },
+  "ink": {
+    "ground": "#141B1C",
+    "neutral": "#FBFDFC",
+    "accent": "#84B4B4",
+    "accent2": "#4C7C7B",
+    "glow": "#6CA39B"
+  },
+  "light_derived": {
+    "paper": "#E0F9F9",
+    "paper_2": "#CFF1F1",
+    "paper_3": "#BDE7E7"
+  },
+  "evidence": {
+    "full_frame": {
+      "ground": {
+        "hex": "#141B1C",
+        "h": 192.5,
+        "s": 0.305,
+        "v": 0.111,
+        "lum": 0.099
+      },
+      "accent": {
+        "hex": "#2D4C54",
+        "h": 193.3,
+        "s": 0.461,
+        "v": 0.331,
+        "lum": 0.274
+      },
+      "accent2": {
+        "hex": "#7A7D63",
+        "h": 68.1,
+        "s": 0.207,
+        "v": 0.491,
+        "lum": 0.481
+      },
+      "neutral": {
+        "hex": "#FBFDFC",
+        "h": 134.3,
+        "s": 0.01,
+        "v": 0.994,
+        "lum": 0.991
+      },
+      "glow": {
+        "hex": "#5A8C8B",
+        "h": 178.8,
+        "s": 0.356,
+        "v": 0.547,
+        "lum": 0.506
+      }
+    },
+    "focus_crop": {
+      "ground": {
+        "hex": "#141A1C",
+        "h": 193.2,
+        "s": 0.299,
+        "v": 0.11,
+        "lum": 0.098
+      },
+      "accent": {
+        "hex": "#84B4B4",
+        "h": 180.0,
+        "s": 0.265,
+        "v": 0.705,
+        "lum": 0.665
+      },
+      "accent2": {
+        "hex": "#4C7C7B",
+        "h": 179.3,
+        "s": 0.383,
+        "v": 0.485,
+        "lum": 0.446
+      },
+      "neutral": {
+        "hex": "#E4ECEA",
+        "h": 162.7,
+        "s": 0.033,
+        "v": 0.926,
+        "lum": 0.918
+      },
+      "glow": {
+        "hex": "#6CA39B",
+        "h": 171.7,
+        "s": 0.336,
+        "v": 0.638,
+        "lum": 0.59
+      }
+    },
+    "avg_lum": 0.398,
+    "bright_share": 0.2426,
+    "focus_avg_lum": 0.474,
+    "distinct_colors": 64
+  },
+  "top6_full": [
+    {
+      "hex": "#141B1C",
+      "share": 0.0288,
+      "h": 192.5,
+      "s": 0.305,
+      "v": 0.111
+    },
+    {
+      "hex": "#242D33",
+      "share": 0.0208,
+      "h": 203.6,
+      "s": 0.296,
+      "v": 0.199
+    },
+    {
+      "hex": "#2B353B",
+      "share": 0.0154,
+      "h": 204.5,
+      "s": 0.272,
+      "v": 0.232
+    },
+    {
+      "hex": "#141D22",
+      "share": 0.0151,
+      "h": 202.7,
+      "s": 0.416,
+      "v": 0.135
+    },
+    {
+      "hex": "#24343B",
+      "share": 0.0149,
+      "h": 198.7,
+      "s": 0.396,
+      "v": 0.232
+    },
+    {
+      "hex": "#2B434C",
+      "share": 0.0131,
+      "h": 196.1,
+      "s": 0.426,
+      "v": 0.296
+    }
+  ]
+}

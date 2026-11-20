@@ -1,0 +1,31 @@
+{
+  "title": "漂泊 · 扉间",
+  "ink": {
+    "ground": "#222A34",
+    "accent": "#C4565B",
+    "accent2": "#9FB4C6",
+    "glow": "#DDE7F0",
+    "neutral": "#2E3742"
+  },
+  "eye": {
+    "kind": "kunai",
+    "steel": "#D3D9E2",
+    "steelDark": "#7C8698",
+    "tag": "#EFE8D8",
+    "_note": "飞雷神苦无源自他这一脉,与水门同一件器物(钢色略冷)"
+  },
+  "art": {
+    "opacity": 0.8,
+    "dim": 0.28,
+    "saturate": 1.05,
+    "veil": 0
+  },
+  "card": {
+    "a": 0.642,
+    "b": 0.63,
+    "quiet": 0.484
+  },
+  "mode": "dark",
+  "tokens": {},
+  "_note": "auto ground #424A54 偏亮会让面板发灰,压深到 #222A34"
+}

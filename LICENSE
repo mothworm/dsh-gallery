@@ -1,0 +1,45 @@
+BSD 3-Clause License
+
+Copyright (c) 2026, The dsh-naruto Authors
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+---
+以下说明**不是上面那份许可证文本的一部分**，只是把三条容易被忽略的边界写在授权旁边。
+The notes below do not modify the license text above; they only state what it does
+not cover.
+
+1. 本仓库**只有代码**，不含任何《火影忍者》素材：图片、视频、PSD 设计稿都不在这里
+   （它们由一份单独投放的私有素材包发出，投放说明与"禁止商用"那条限制跟着那个包走，
+   不约束本仓库的代码）。判据与复查命令见 `dsh-boot-suites/naruto/README.md`「素材分离」。
+
+2. 上面授予的是**本代码**的版权。它**不授予**、也不可能授予任何作品名称、角色形象、
+   商标或美术著作权：《火影忍者》原作 © 岸本齐史／集英社／MIZUKI SHOUNEN 事务所，
+   游戏形象 © 《火影忍者》手游运营方，均归各自权利人。要商用请先自己去拿到权利方的许可。
+
+3. 本插件与 DeepSeek Harness、与任何《火影忍者》官方产品**都没有赞助或背书关系**。

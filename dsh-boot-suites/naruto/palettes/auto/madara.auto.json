@@ -1,0 +1,152 @@
+{
+  "_generated_by": "tools/extract-palette.py v2 -- DO NOT HAND EDIT (每次重跑都被覆盖)",
+  "_tuned_layer": "tuned/<preset>.json  (人工微调写这里,合并时覆盖本文件)",
+  "preset": "madara",
+  "title": "宇智波 · 斑",
+  "hero": {
+    "file": "04.jpg",
+    "pos": "52% 41%",
+    "eye": "52% 37%",
+    "acts": 4,
+    "fallback": null,
+    "errors": []
+  },
+  "source": {
+    "image": "04.jpg",
+    "bytes": 127564,
+    "focus_box": [
+      0.6,
+      0.7
+    ]
+  },
+  "ink": {
+    "ground": "#23132B",
+    "neutral": "#1C121C",
+    "accent": "#4C0322",
+    "accent2": "#BC5C53",
+    "glow": "#BC5C53"
+  },
+  "light_derived": {
+    "paper": "#F9E0EA",
+    "paper_2": "#F1CFDE",
+    "paper_3": "#E7BDCF"
+  },
+  "evidence": {
+    "full_frame": {
+      "ground": {
+        "hex": "#23132B",
+        "h": 279.8,
+        "s": 0.551,
+        "v": 0.168,
+        "lum": 0.095
+      },
+      "accent": {
+        "hex": "#4B0323",
+        "h": 333.5,
+        "s": 0.957,
+        "v": 0.293,
+        "lum": 0.081
+      },
+      "accent2": {
+        "hex": "#3C234A",
+        "h": 278.2,
+        "s": 0.523,
+        "v": 0.289,
+        "lum": 0.169
+      },
+      "neutral": {
+        "hex": "#1C121C",
+        "h": 298.2,
+        "s": 0.364,
+        "v": 0.112,
+        "lum": 0.082
+      },
+      "glow": null
+    },
+    "focus_crop": {
+      "ground": {
+        "hex": "#2D143B",
+        "h": 278.2,
+        "s": 0.652,
+        "v": 0.23,
+        "lum": 0.111
+      },
+      "accent": {
+        "hex": "#4C0322",
+        "h": 334.2,
+        "s": 0.958,
+        "v": 0.297,
+        "lum": 0.082
+      },
+      "accent2": {
+        "hex": "#BC5C53",
+        "h": 5.1,
+        "s": 0.558,
+        "v": 0.736,
+        "lum": 0.438
+      },
+      "neutral": {
+        "hex": "#1B141B",
+        "h": 299.7,
+        "s": 0.256,
+        "v": 0.106,
+        "lum": 0.086
+      },
+      "glow": {
+        "hex": "#BC5C53",
+        "h": 5.1,
+        "s": 0.558,
+        "v": 0.736,
+        "lum": 0.438
+      }
+    },
+    "avg_lum": 0.172,
+    "bright_share": 0.0185,
+    "focus_avg_lum": 0.224,
+    "distinct_colors": 63
+  },
+  "top6_full": [
+    {
+      "hex": "#23132B",
+      "share": 0.0231,
+      "h": 279.8,
+      "s": 0.551,
+      "v": 0.168
+    },
+    {
+      "hex": "#4B0323",
+      "share": 0.0147,
+      "h": 333.5,
+      "s": 0.957,
+      "v": 0.293
+    },
+    {
+      "hex": "#221325",
+      "share": 0.0147,
+      "h": 293.2,
+      "s": 0.493,
+      "v": 0.143
+    },
+    {
+      "hex": "#3C051E",
+      "share": 0.0145,
+      "h": 333.0,
+      "s": 0.912,
+      "v": 0.234
+    },
+    {
+      "hex": "#150B1B",
+      "share": 0.0143,
+      "h": 276.1,
+      "s": 0.601,
+      "v": 0.108
+    },
+    {
+      "hex": "#1D1123",
+      "share": 0.0133,
+      "h": 279.2,
+      "s": 0.507,
+      "v": 0.138
+    }
+  ]
+}

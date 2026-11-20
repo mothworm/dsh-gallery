@@ -1,0 +1,134 @@
+{
+  "_generated_by": "tools/extract-palette.py v2 -- DO NOT HAND EDIT (每次重跑都被覆盖)",
+  "_tuned_layer": "tuned/<preset>.json  (人工微调写这里,合并时覆盖本文件)",
+  "preset": "hashirama",
+  "title": "侠隐 · 柱间",
+  "hero": {
+    "file": "04.jpg",
+    "pos": "48% 8%",
+    "eye": null,
+    "acts": 4,
+    "fallback": null,
+    "errors": []
+  },
+  "source": {
+    "image": "04.jpg",
+    "bytes": 237137,
+    "focus_box": [
+      0.6,
+      0.7
+    ]
+  },
+  "ink": {
+    "ground": "#1C1C1B",
+    "neutral": "#1C1C1B",
+    "accent": "#151412",
+    "accent2": null,
+    "glow": null
+  },
+  "light_derived": {
+    "paper": "#F9F0E0",
+    "paper_2": "#F1E6CF",
+    "paper_3": "#E7D9BD"
+  },
+  "evidence": {
+    "full_frame": {
+      "ground": {
+        "hex": "#1C1C1B",
+        "h": 53.4,
+        "s": 0.025,
+        "v": 0.109,
+        "lum": 0.109
+      },
+      "accent": {
+        "hex": "#1C1C1B",
+        "h": 53.4,
+        "s": 0.025,
+        "v": 0.109,
+        "lum": 0.109
+      },
+      "accent2": null,
+      "neutral": {
+        "hex": "#1C1C1B",
+        "h": 53.4,
+        "s": 0.025,
+        "v": 0.109,
+        "lum": 0.109
+      },
+      "glow": null
+    },
+    "focus_crop": {
+      "ground": {
+        "hex": "#151412",
+        "h": 47.0,
+        "s": 0.149,
+        "v": 0.082,
+        "lum": 0.079
+      },
+      "accent": {
+        "hex": "#151412",
+        "h": 47.0,
+        "s": 0.149,
+        "v": 0.082,
+        "lum": 0.079
+      },
+      "accent2": null,
+      "neutral": {
+        "hex": "#F3F2ED",
+        "h": 45.6,
+        "s": 0.024,
+        "v": 0.954,
+        "lum": 0.948
+      },
+      "glow": null
+    },
+    "avg_lum": 0.492,
+    "bright_share": 0.396,
+    "focus_avg_lum": 0.636,
+    "distinct_colors": 64
+  },
+  "top6_full": [
+    {
+      "hex": "#1C1C1B",
+      "share": 0.0353,
+      "h": 53.4,
+      "s": 0.025,
+      "v": 0.109
+    },
+    {
+      "hex": "#242423",
+      "share": 0.0349,
+      "h": 58.5,
+      "s": 0.031,
+      "v": 0.142
+    },
+    {
+      "hex": "#141413",
+      "share": 0.0324,
+      "h": 47.4,
+      "s": 0.049,
+      "v": 0.079
+    },
+    {
+      "hex": "#2C2C2B",
+      "share": 0.0312,
+      "h": 57.5,
+      "s": 0.03,
+      "v": 0.173
+    },
+    {
+      "hex": "#343432",
+      "share": 0.0311,
+      "h": 60.0,
+      "s": 0.03,
+      "v": 0.204
+    },
+    {
+      "hex": "#3C3C3A",
+      "share": 0.0253,
+      "h": 51.9,
+      "s": 0.03,
+      "v": 0.237
+    }
+  ]
+}

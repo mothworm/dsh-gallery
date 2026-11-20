@@ -1,0 +1,70 @@
+# 画面资源不入库 —— 2026-11-14 定；2026-11-20 改写本文件本身，并解除"整目录别提交"
+#
+# ⚠ 这个文件以前**不是一份能用的 .gitignore**：除了末尾那个围栏里的几行，整篇是散文。
+#   中文句子、``` 围栏、`**不随代码分发**（禁止商用）` 全被 git 当成"模式"在读
+#   （媒体规则歪打正着还生效，但属于意外之得）。说明性内容归 README.md，这里只留规则 + 最短的理由。
+#
+# 11-14 那版为什么写"本目录目前不要提交"：
+#   当时 lib\client.js 是 1,904,832 B，内嵌 9 处 data:image/jpeg;base64（≈1.33 MB
+#   火影手游美术：幕1–幕5 / 纸翼 / 爆炸 / duel）。那些东西不随代码分发，
+#   所以整目录在剥掉内嵌图之前不进 git。
+# ⇒ 2026-11-20 复核：**这条前提已经不成立了**，本目录可以进版本库 ——
+#   lib\client.js 现在 45,860 B，data:image/(jpeg|png|webp) 命中 **0**（"base64" 只剩注释里的字）；
+#   内置九幕改成运行时从 %USERPROFILE%\.dsh\boot-naruto\frames\NN.jpg 取
+#   （lib\index.js 的 framesDir() = join(homeDir(), "frames")，
+#    lib\client.js 的 const FR = "/" + PKG + "/frames/"），
+#   那九张图由私有素材包投放（v7 包里 frames/ 9 条 / 1,395,945 B），不在代码树里。
+#   复查命令与逐条口径见 ../dsh-boot-suites/naruto/README.md「素材分离」一节。
+#
+# 下面这些规则的作用是**防以后有人把参考图、导出稿、截图稿塞进代码树**：
+# 版权物料一旦进了 git 历史，要清干净得改写历史，比一开始不放进去贵得多。
+
+# —— 位图 ——
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.avif
+*.bmp
+*.ico
+*.tif
+*.tiff
+*.heic
+
+# —— 视频 ——
+*.mp4
+*.m4v
+*.mkv
+*.webm
+*.mov
+*.avi
+
+# —— 设计稿与打包产物（同样会带版权物料）——
+*.psd
+*.psb
+*.xcf
+*.sketch
+*.fig
+*.zip
+*.7z
+*.rar
+
+# —— 运行时投放位：宿主读盘根的那几棵树都在仓库外，这里只是防有人在代码树里就地新建 ——
+arts/
+clips/
+frames/
+selection.json
+boot.log
+
+# —— 杂项垃圾 ——
+node_modules/
+*.bak
+*.bak-*
+*.tmp
+Thumbs.db
+.DS_Store
+
+# 注意：**tools\fixtures\*.json 是要入库的**（真宿主快照夹具，自测直接吃它）。
+# 上面没有一条 *.json 规则，所以夹具不会被误伤。但目录名规则是全局的 ——
+# 若将来代码树里出现叫 frames / arts / clips 的**非素材**目录，得在这里点名放行。
