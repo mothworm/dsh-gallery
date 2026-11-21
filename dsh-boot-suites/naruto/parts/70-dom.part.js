@@ -12,7 +12,7 @@ let tkTheme = null;   // ctx.inject(["theme"]) 给的句柄
 let panelOpen = false;
 // 构建戳:探针日志和「点配饰按钮」那条日志**共用这一个常量**。写成两处字面量的话,
 // 总有一天只改了一处 —— 那时日志一半说 b1931、一半说 b2011,而两边都"看起来像新代码在跑"。
-const BUILD_STAMP = "b2011";
+const BUILD_STAMP = "b2111";
 let PENDING;          // 刚点过、等清单回读出同一个 id 才算真生效
 let chipHold = 0, chipTimer = null;
 
@@ -344,25 +344,19 @@ function cardCommit() {
 // 所以这个变量留着当"最后一次见过的 palette"占位 —— 删了它,那行赋值就是 ReferenceError。
 let decoPal = null;
 const DECO_KEY = NS + "-deco";
-// 底框成品的**环带几何**(成品画布 720x260 的像素,横,纵)。**唯一来源是生成器**:
-// `dsh-naruto-pack\tools\build-frames.py --ring 44,14 --feather 26,10 --aniso`(用户 11-20 定 C 档)。
-// 这里只抄它的输出,不许自己另调一套 —— 抄错了净空就会算错(而那种错在真机上是"首行被角素压住",
-// 看起来像审美问题,不像算错)。配套对照表(probe-clear.py 出的五遁最坏值,x=10% 一档):纵需让到 8.9%。
-const FRAME_W = 720, FRAME_H = 260;
-const FRAME_RING = [44, 14];      // 保留外环厚 横/纵
-const FRAME_FEATHER = [26, 10];   // 内侧羽化 横/纵
-// 卡片内缩 = **比例**内缩(画布% == 卡片%),因为整图按 `background-size:100% 100%` 拉伸 ⇒ 底图上的
-// 一个百分比落到卡片上还是同一个百分比。11-20 之前这里是硬编码 26/36 px:矮卡(120)上 26px 等于
-// 22% 纵向、高卡(230)上只等于 11% —— 同一套数字在三种卡高上净空不同,这就是用户点名的
-// 「矮卡纵向被压扁」的第二个成因(第一个是环带本身用了 min(到四边距离),已由 --aniso 治掉)。
+// 底框成品的几何。**唯一来源是生成器**:`dsh-naruto-pack\tools\build-frames.py`(默认 --mode deco)。
 //
-// ⚠ **比例的分子分母必须同一量纲**。第一版写的是 (ring+feather)/FRAME_W 对**两轴**都除 720,
-// 结果是 ins_x=9.72% / ins_y=3.69% —— 纵向只有横向的 38%,自测当场抓到 `纵向小于横向`。
-// 纵轴的 24px 是 24/260,不是 24/720。改这里之前先想清楚"这一维的 100% 到底是谁"。
-const FRAME_INSET = {
-	x: (FRAME_RING[0] + FRAME_FEATHER[0]) / FRAME_W * 1.15,   // 70/720 = 9.72% -> 11.18%
-	y: (FRAME_RING[1] + FRAME_FEATHER[1]) / FRAME_H * 1.15,   // 24/260 = 9.23% -> 10.61%
-};
+// 11-21 用户裁决换掉旧环带方案的原话:「不够好看,这种五遁文本框配饰能不能弄到文本框的真正边缘呢,
+// 而不是在原本文本框里边展现」。旧方案只留一条环带,把素材里**构成"框"的主体**剃掉了,
+// 只剩四角碎片。现在成品 = PSD 的 Frame+Deco 两层并集**整张原样缩放**(720x456,与 PSD 同比例):
+// 框线就在卡片边上、四角浪花骑在四个角上,和素材原稿一样;中央仍透明 ⇒ 吃滑块的填充层照旧管文字底。
+//
+// 内缩据此重算:框线内沿在成品图里约在 x=13%、y=11.5% 处(实测浪花/框线的内边缘) ——
+// 但**四角浪花只占上面一段**,正文要躲开的是"角素的实际高度",不是整张图的比例。
+// 取保守值:横 13%(卡宽)、纵 15.5%(卡宽 —— 注意纵向也用卡宽折算,因为卡片高随内容变、
+// 而底图是等比拉伸的:纵向比例 = 卡高/456*720,用卡宽做尺子才不会被"矮卡"算成 0 净空)。
+const FRAME_ASPECT = 456.0 / 720.0;      // 成品图 高/宽;纵向百分比 = 卡宽 * 这个 * 图内纵向百分比
+const FRAME_INSET = { x: 0.130, y: 0.150 };
 // 卡片宽度**不写常数**:产品里量 node.getBoundingClientRect().width(下面 applyDecoVars),
 // 所以窗口拖窄、宿主改宽都自动跟上。这一行曾经留了个 `FRAME_CARD_W = 420` 的"参考宽",
 // 结果产品里根本没人用它 —— 那只会让人以为内缩按 420 写死。
@@ -458,7 +452,11 @@ function applyDecoVars(pal) {
 			// 夹具/真机都可能量到一个极窄的宽度;夹到 [240, 900] 免得算出荒谬的内缩(窄卡宁可按 240 算,宽卡按 900 封顶)
 			const cwUse = Math.min(900, Math.max(240, cw));
 			const ex = Math.round(cwUse * FRAME_INSET.x);   // 横向:按卡宽折算
-			const ey = Math.round(cwUse * FRAME_INSET.y);   // 纵向:同一把尺子(画布% == 卡片%,所以也按卡宽折算)
+			// 纵向:底图是按 100% 100% 拉伸的,图内纵向百分比落到卡片上 = 卡高 * 该百分比。
+			// 卡高随内容变(矮卡 120 / 高卡 230),而我们**不想**让净空随卡高忽大忽小
+			// (用户点名「矮卡纵向被压扁」就是这么来的)⇒ 统一按**卡宽 × 图纵横比 × 图内纵向百分比**算,
+			// 于是三种卡高拿到同一个 px 数,而不是"矮卡算出来 0"。
+			const ey = Math.round(cwUse * FRAME_ASPECT * FRAME_INSET.y);
 			root.style.setProperty("--bs-frame-pt", (b.t + ey) + "px");
 			root.style.setProperty("--bs-frame-pr", (b.r + ex) + "px");
 			root.style.setProperty("--bs-frame-pb", (b.b + ey) + "px");
@@ -781,7 +779,7 @@ function contrastProbe(tag) {
 			//   frame = 这一档的底框 URL 有没有从清单 st.ui.files[].url 里解析出来(1 有 / 0 没有)。
 			//   frame=0 而 deco≠none ⇒ 十有八九是资源包没把 PNG 放进 arts\ui\,或文件名对不上(大小写除外)。
 			//   为什么不能只看画面:border-image 的图挂了不留任何痕迹,"看不到框"和"没加载新代码"长一模一样。
-			// 构建戳(现在 b2011 = 各向异性环带 C 档 ring 44,14 + 比例内缩;前一版 b1931 = 丙方案标量环 58/30):
+			// 构建戳(现在 b2111 = 整张装饰层 deco 模式 + 新内缩;前一版 b2011 = 各向异性环带 C 档):
 			// 日志里出现当前这个戳,就是"新代码真在跑"的直接证据,不用肉眼比对。
 			const curMode = decoGet();
 			const curFile = (DECO_MODES[curMode] || DECO_MODES.none).file;

@@ -534,24 +534,26 @@ console.log('\n[5c] 瞳纹形状与瞳红')
     '更早那版 --bs-deco-a/-b 两层 background-image 也不许残留(它和丙用同一个属性,回来就会互相顶掉)')
   ok(/none: \{ file: null \}/.test(SRC),
     '「配饰:无」真的既不画底框也不内缩(file=null;没有 file 就解析不出 URL,内缩那条路整个不进)')
-  // 11-20:内缩从硬编码 26/36 px 改成**按环带几何的比例**(C 档 ring 44,14 / feather 26,10)。
-  // 这里不钉死某个数字,而是**把产品源码里的 FRAME_RING/FRAME_FEATHER 解析出来**再算期望值 ——
-  // 钉死数字的话,下次调参就得改自测(假失败),而"改了参数忘了改 CSS"这种真错反而查不出来。
-  // ⚠ 挂在全局上:行为断言那几块在别的块作用域里(它们自己读产物,不蹭局部变量),需要同一个期望值。
+  // 11-20:内缩从硬编码 26/36 px 改成按比例(当时按环带几何)。
+  // 11-21:底框换成"整张装饰层"(deco 模式),几何常量也跟着换 —— 但**仍然不钉死数字**:
+  // 把产品源码里的 FRAME_INSET / FRAME_ASPECT 解析出来再算期望值,调参不用改自测。
+  // ⚠ 挂在全局上:行为断言那几块在别的块作用域里,需要同一个期望值。
   GEO = (() => {
-    const m1 = SRC.match(/const FRAME_RING = \[(\d+), (\d+)\];/)
-    const m2 = SRC.match(/const FRAME_FEATHER = \[(\d+), (\d+)\];/)
-    if (!m1 || !m2) return null
-    const rx = +m1[1], ry = +m1[2], fx = +m2[1], fy = +m2[2]
-    // ⚠ 两轴各自的"100%"不同:横是成品画布宽 720,纵是画布高 260。第一版两轴都除 720,
-    // 得到 insY=13px —— 纵向只剩横向的 38%,自测当场红。这条算式必须照抄产品里的同一把尺子。
-    return { rx, ry, fx, fy, insX: Math.round(420 * (rx + fx) / 720 * 1.15), insY: Math.round(420 * (ry + fy) / 260 * 1.15) }
+    const m = SRC.match(/const FRAME_INSET = \{ x: ([\d.]+), y: ([\d.]+) \};/)
+    const ma = SRC.match(/const FRAME_ASPECT = ([\d.]+) \/ ([\d.]+);/)
+    if (!m || !ma) return null
+    const ix = parseFloat(m[1]), iy = parseFloat(m[2])
+    const aspect = parseFloat(ma[1]) / parseFloat(ma[2])
+    // 产品里的算式:ex = 卡宽 x INSET.x ; ey = 卡宽 x ASPECT x INSET.y(纵向也以卡宽为尺子,见源码注释)
+    return { ix, iy, aspect, insX: Math.round(420 * ix), insY: Math.round(420 * aspect * iy) }
   })()
   {
     const geo = GEO
-    ok(!!geo && geo.insY < geo.insX,
-      '文字内缩按**环带几何**算且**纵向小于横向**(各向异性:上下边带比左右窄,纵向还白让 26 就不对了)。实际 ' + (geo ? JSON.stringify(geo) : '源码里解析不出 FRAME_RING/FRAME_FEATHER'))
-    ok(/FRAME_INSET/.test(SRC) && !/in: 26/.test(SRC),
+    ok(!!geo && geo.insY >= 20 && geo.insY <= 80,
+      '纵向内缩是**按卡宽折算的合理值**(底图 720x456 等比拉伸 ⇒ 纵向不能直接吃卡高比例)。实际 ' + (geo ? JSON.stringify(geo) : '源码里解析不出 FRAME_INSET/FRAME_ASPECT'))
+    ok(!!geo && geo.ix > 0.05 && geo.ix < 0.30 && geo.iy > 0.05 && geo.iy < 0.40,
+      '两个内缩比例都在"躲开角素、又不至于把正文挤没"的区间里(0.05~0.30 / 0.05~0.40)。实际 ' + (geo ? geo.ix + '/' + geo.iy : '解析失败'))
+    ok(/FRAME_INSET/.test(SRC) && /FRAME_ASPECT/.test(SRC) && !/in: 26/.test(SRC),
       '硬编码的 `in: 26` 已彻底不存在(档位表里只剩 file;留着旧字段迟早有人以为它还在生效)')
   }
   ok(/":root\[data-bs-frame\] " \+ CARD_SEL/.test(SRC) && /root\.removeAttribute\("data-bs-frame"\)/.test(SRC) && /root\.setAttribute\("data-bs-frame", mode\)/.test(SRC),

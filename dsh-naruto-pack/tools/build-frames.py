@@ -1,28 +1,44 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-r"""五遁底框成品生成器(丙方案:整图缩放 + 只留外环,中央烤成透明)。
+r"""五遁底框成品生成器。**两种模式**,默认 `--mode deco`(整张装饰层),旧环带模式留作对照/回退。
 
-为什么是这个形状(2026-11-19 用户选定丙,依据见 _handoffs\dsh-可视化\20261119-133558-*.md):
-  素材是 1929x1222 的**整幅画面**,四角特效向内伸入 >=520 px(占高度 43%)。
-  - 单一 border-image 九宫:小 slice 把那 43% 的画面整块丢掉;大 slice 又必须把角缩到 border-width,细节糊掉。
-  - 四角精灵 1:1(乙):角图小就没画面感、大就压字,而且每遁要 5 个文件。
-  - 丙:整图非等比缩到卡片,只保留外圈一条环,内侧羽化淡出,中央完全透明。
-    变形确实存在,但被关进窄环里(环上多是描边与软火光,肉眼难察觉);
-    中央透明 ⇒ 那块**吃滑块的 CSS 填充层**照旧管文字底,所以「拖滑块改透明度」不受影响(用户的硬要求)。
+## 为什么要换模式(2026-11-21 用户裁决,别再改回去)
 
-两个必须记住的量纲教训(都是本轮实测翻出来的,别再改回去):
+用户的原话:「不够好看,这种五遁文本框配饰能不能弄到文本框的真正边缘呢,而不是在原本文本框里边展现」。
+
+旧的丙方案(`--mode band`)只保留外圈一条环带、把中央烤成透明。它把素材里**构成"框"的主体**剃掉了:
+框线环带 + 四角之间的连接全被裁掉,只剩四角一小撮,于是看起来像四片碎片缩在卡片里面。
+更糟的是环带参数一改(11-20 的 `ring 44,14`),连那撮也会被切碎 —— 实测视觉复核:"水/风两遁角素基本认不出"。
+
+把 PSD 的 Frame+Deco 两层并集单独导出来看就清楚了:**它本身就是一张完整的框** ——
+四角浪花 + 直框线 + 中间深处的晕染,比例和 PSD 原图一致,中央天然几乎全透。
+所以 `--mode deco` 只做一件事:把这两层并集**原样缩放**到成品画布,不裁不补、不造环带。
+  · 框线落在外圈、四角浪花骑在四个角上,和素材原稿一模一样;
+  · 中央透明 ⇒ 那块**吃滑块的 CSS 填充层**照旧管文字底(用户的硬要求,从 11-19 起没变);
+  · 相框比例 = PSD 比例(720x456),贴到任意卡片尺寸都由 CSS 拉伸,不会再"随卡高被切掉角"。
+
+## 旧模式(`--mode band`)仍然保留
+
+11-19 发货版靠它的默认参数 `--ring 58 --feather 30` 复现(等价性闸门:五张 SHA256-12 全等)。
+要回退/做对照就 `--mode band`,产物与 11-19 发货、11-20 C 档都能逐字节对上。
+
+## 两个必须记住的量纲教训(都是实测翻出来的,别再改回去)
+
   1) **先裁到画面实际边界再缩放**。素材的画框线不在画布最外缘:InnerBG 面板从 x=106/1929(5.5%)、
      y=109/1222(8.9%) 才开始。不裁就直接缩,外环会整条落在透明留白里 —— 实测环内只有 0.5% 不透明。
-  2) **环厚要按"渲染后多厚"定,不是按成品图坐标拍脑袋**。成品画布 720x260,卡片实际高约 120~230,
+     (band 模式用;deco 模式不裁,因为整张框都要。)
+  2) **环厚要按"渲染后多厚"定,不是按成品图坐标拍脑袋**。band 模式成品画布 720x260,卡片实际高约 120~230,
      所以成品图里 58 px 才等于渲染出来约 27~19 px 的可见环。改 --tw/--th 必须同时改 --ring。
 
 输入:火影遁术文本框\PSD分层\{earth,fire,thunder,water,wind}.psd   层名 InnerBG / Frame / Deco
 产出:<out>\frame-{doton,katon,raton,suiton,futon}.png(每遁 1 张,中央透明,RGBA)
 
 ⚠ 解释器:必须用**系统 python 3.10**(_pylibs 是 cp310 编译的)。别用 DSH 自带 3.12,
-   否则 _pylibs 里那份 Pillow 会报 `cannot import name '_imaging'`(ABI 不匹配,本轮实测过)。
+   否则 _pylibs 里那份 Pillow 会报 `cannot import name '_imaging'`(ABI 不匹配,实测过)。
 
-用法: python build-frames.py --psd "D:\\...\\火影遁术文本框\\PSD分层" --out "D:\\...\\dsh-naruto-pack\\ui"
+用法:
+  python build-frames.py --psd "...\PSD分层" --out "...\dsh-naruto-pack\ui"                    # 现行:整张装饰层
+  python build-frames.py --psd "...\PSD分层" --out "...\_scratch\..." --mode band --only doton  # 回退/对照
 """
 import argparse
 import os
@@ -175,9 +191,77 @@ def depth_table(alpha, xs):
     return rows, cols
 
 
+def build_deco(psd_path, out_path, tgt_w, tgt_h, near_thr=24, grow=0, flat_thr=40, mid=0.30):
+    """整张装饰层模式(2026-11-21 起的默认):Frame+Deco 并集**原样缩放**,不裁不补、不造环带。
+
+    只做三件事:
+      1) 把两层按 PSD 层序 alpha_composite 成一张(InnerBG 不进成品:中央归吃滑块的 CSS 填充层);
+      2) 清掉"内底暗纹被误并进 Frame 层"的像素 —— 风遁中央那一大团(alpha 常到 255,连成 3856 px 的块)
+         不是框,是内底面版的暗纹。判据用**颜色**:蓝框线/浪花的 B 通道显著高于 R;暗纹是中性灰蓝(R≈G≈B)。
+         实测风遁那团平均 RGB≈(39,67,74):B-R=35 看着像蓝,但 B/G=1.11 是灰;
+         真正的框线/浪花 B/G ≥ 1.15 且亮度更高。所以按 `B/G` 与亮度双条件判,而不是只看"够不够亮"。
+      3) reduce 缩放时走 Pillow 的 `reduce()`(盒式面积平均),而不是普通 LANCZOS:
+         蓝框线只有 1~2 px,缩到 720 宽会直接从像素缝里漏光。
+
+    :grow 为 0 时按"整张缩小";>0 时先把画布外扩 grow 像素(内容位置不变),等于整体往里收一点。
+    :mid  中央"必空"的比例:这块区域内、既不满足蓝色判据也不够亮的像素一律清掉(兜底,防止零星星点脏字)。
+    """
+    import numpy as np
+    from PIL import Image
+    from psd_tools import PSDImage
+    psd = PSDImage.open(psd_path)
+    acc = None
+    for ly in psd:
+        nm = LAYER_MAP.get(str(ly.name).strip().lower())
+        if nm not in ("border", "corners"):
+            continue
+        im = ly.topil()
+        if im is None:
+            continue
+        full = Image.new("RGBA", (psd.width, psd.height), (0, 0, 0, 0))
+        full.paste(im.convert("RGBA"), (max(0, ly.left), max(0, ly.top)))
+        acc = full if acc is None else Image.alpha_composite(acc, full)
+    if acc is None:
+        print("  !! %s 的 Frame/Deco 两层全空,不出图" % os.path.basename(psd_path))
+        return None
+    a = np.asarray(acc).astype("float32")
+    r, g, b, al = a[:, :, 0], a[:, :, 1], a[:, :, 2], a[:, :, 3]
+    blueish = (b >= g * 1.15) & (b > 70)          # 蓝框线 / 浪花
+    bright = al >= flat_thr
+    keep = blueish | bright
+    # 中央"必空"区:这里只留真的蓝的,其余(内底暗纹、星点)一律清掉
+    h0, w0 = al.shape
+    core = np.zeros_like(keep)
+    core[int(h0 * mid):int(h0 * (1 - mid)), int(w0 * mid):int(w0 * (1 - mid))] = True
+    keep = np.where(core, blueish & bright, keep)
+    a[:, :, 3] = al * keep
+    acc = Image.fromarray(np.clip(a, 0, 255).astype("uint8"), "RGBA")
+    if grow:
+        pad = Image.new("RGBA", (acc.size[0] + grow * 2, acc.size[1] + grow * 2), (0, 0, 0, 0))
+        pad.alpha_composite(acc, (grow, grow))
+        acc = pad
+    img = acc.reduce((acc.size[0] + tgt_w - 1) // tgt_w) if acc.size[0] >= tgt_w * 2 else acc
+    img = img.resize((tgt_w, tgt_h), Image.LANCZOS)
+    img.save(out_path, optimize=True)
+    b = np.asarray(img)[:, :, 3]
+    core = b[int(tgt_h * .30):int(tgt_h * .70), int(tgt_w * .30):int(tgt_w * .70)]
+    return {
+        "bytes": os.path.getsize(out_path), "size": (tgt_w, tgt_h),
+        "ink_px": int((b > 8).sum()),
+        "centre_pct": round(100.0 * (core > near_thr).mean(), 2),
+        "corners": [round(100.0 * (b[:tgt_h // 5, :tgt_w // 5] > 8).mean(), 1),
+                    round(100.0 * (b[:tgt_h // 5, -tgt_w // 5:] > 8).mean(), 1),
+                    round(100.0 * (b[-tgt_h // 5:, :tgt_w // 5] > 8).mean(), 1),
+                    round(100.0 * (b[-tgt_h // 5:, -tgt_w // 5:] > 8).mean(), 1)],
+    }
+
+
 def build_one(psd_path, out_path, tgt_w, tgt_h, ring, feather, pad,
               fold=None, fold_layers=("corners",)):
-    """把一张 PSD 合成成底框成品(丙方案)。
+    """旧环带模式(`--mode band`):把一张 PSD 合成成**只留外环、中央烤透明**的成品。
+
+    ⚠ 2026-11-21 起不是默认。用户裁定它"在边框里边展现"不好看 —— 因为它把框线环带剃掉了。
+      现在只用于:① 复现 11-19 发货版(等价性闸门)② 11-20 C 档对照 ③ 用户明确要回退时。
 
     11-20 改:Deco 层折回外环,而且**折在成品画布坐标下**,不是在源分辨率上。
     为什么挪坐标:ring / feather / 中央清账判据全都在成品坐标里说话,
@@ -284,7 +368,16 @@ def main():
     ap.add_argument("--psd", required=True, help="PSD分层 目录")
     ap.add_argument("--out", required=True, help="成品目录(frame-<遁>.png)")
     ap.add_argument("--tw", type=int, default=720, help="成品画布宽(默认 720)")
-    ap.add_argument("--th", type=int, default=260, help="成品画布高(默认 260 ⇒ 2.77:1,贴近典型卡片)")
+    ap.add_argument("--th", type=int, default=456,
+                    help="成品画布高。deco 模式下**默认 456 = 与 PSD 同比例**(720x456 ≈ 1929x1222);"
+                         "band 模式下传 260 才等于 11-19 发货版。改 --tw 要一起改 --th。")
+    ap.add_argument("--mode", choices=("deco", "band"), default="deco",
+                    help="deco(现行,默认)= Frame+Deco 并集整张缩放,框线在卡片边上、角素骑在角上;"
+                         "band = 旧丙方案(只留外环、中央烤透明),用于复现 11-19 发货版 / 11-20 C 档对照 / 回退。")
+    ap.add_argument("--flat", type=int, default=40, dest="flat_thr",
+                    help="deco 模式:alpha 低于它的像素直接清零(内底亮斑被误并进 Frame 层,留在中间会脏字)")
+    ap.add_argument("--grow", type=int, default=0,
+                    help="deco 模式:先把画布外扩这么多源像素(内容位置不变 ⇒ 整体相对画布往里收了一点)")
     ap.add_argument("--ring", default="58",
                     help="保留外环厚**分轴** (横,纵),成品图坐标:`--ring 44,18`。"
                          "单值 = 两轴同值(缺省 58 = 11-19 发货版的老行为)。")
@@ -340,6 +433,15 @@ def main():
             print("  -- %s 没找到 %s.psd,跳过" % (mode, stem))
             continue
         dst = os.path.join(args.out, "frame-%s.png" % mode)
+        if args.mode == "deco":
+            r = build_deco(src, dst, args.tw, args.th, grow=args.grow, flat_thr=args.flat_thr)
+            if not r:
+                continue
+            n += 1
+            print("  %-7s -> frame-%s.png  %6d B  墨 %6d px" % (stem, mode, r["bytes"], r["ink_px"]))
+            print("          整张装饰层缩到 %dx%d;中央 40%% 区域墨占比 %.2f%%(只该剩压制后的零星);"
+                  "四角墨占比 %s" % (r["size"][0], r["size"][1], r["centre_pct"], r["corners"]))
+            continue
         r = build_one(src, dst, args.tw, args.th, ring, feather, args.pad,
                       fold=fold, fold_layers=fl)
         if not r:
