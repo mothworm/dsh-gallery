@@ -541,7 +541,12 @@ console.log('\n[5b] 面板文字必须**算**出来,不是靠 opacity 蒙')
   // 盯**调用**而不是提法:产物里有两处注释写着"禁 Math.random",按 /Math\.random/ 会自己抓自己
   ok(!/Math\.random\(/.test(SRC), '产物里没有 Math.random **调用**(纹样坐标写死,同一张卡每次渲染必须长一样)')
   const dir = fileURLToPath(new URL("../palettes/tuned/", import.meta.url))
-  const files = fsM.readdirSync(dir).filter((x) => x.endsWith(".json"))
+  // ⚠ 2026-11-22 修: **目录不存在**与"目录空"必须同等对待。
+  // 为什么:调色已不随仓库分发,`palettes/tuned/` 在别人的 clone 里**根本不存在**
+  // (git 不跟踪空目录),于是 readdirSync 直接抛 ENOENT ——
+  // 实测在干净 clone 里跑自测,**第一屏就是崩溃**,别人连"能不能用"都判断不了。
+  // "没有内置调色"本来就是合法状态(见下面那条注释),不该以崩溃的形式表达。
+  const files = fsM.existsSync(dir) ? fsM.readdirSync(dir).filter((x) => x.endsWith(".json")) : []
   const over = []
   for (const f of files) {
     const c = (JSON.parse(fsM.readFileSync(dir + f, "utf8")) || {}).card

@@ -52,6 +52,33 @@
 
 ## 发货闸门（顺序是死的）
 
+## 装（两步，各一条命令）
+
+```bash
+git clone https://github.com/mothworm/dsh-gallery.git
+cd dsh-gallery
+
+# 1. 宿主侧：开屏动画（装完要**重启** DSH 才生效）
+node dsh-boot-gallery/tools/install.mjs --profile desktop
+
+# 2. 页面侧：悬浮球 + 壁纸面板 + 磨砂玻璃（刷新即可）
+node dsh-boot-suites/gallery/tools/install.mjs --profile desktop
+```
+
+两个脚本都会：校验源文件 → 备份 profile 的 `cordis.patch.yml` → 复制并**逐文件核摘要** →
+确保 patch 里有对应条目（已有就不重复追加）。
+
+**不需要编译**：`lib/client.js` 等构建产物已随仓库提供。只有改 `parts/` 源码的人才需要重建。
+
+装完重启 DSH，应该能看到开屏动画；进桌面后点悬浮球换主题。
+自带三套风景开箱即用，加自己的主题见
+[添加主题素材包](dsh-gallery-pack/tools/添加主题素材包.md)。
+
+> macOS / Linux 上同样两条命令（把 `--profile desktop` 保持不变）。
+> ⚠ 本仓库在 **Windows 上验证过**；macOS 未经实机验证，遇到报错请开 issue。
+
+## 发货闸门（改代码的人看）
+
 在 `dsh-boot-suites/gallery/` 下：
 
 ```
@@ -60,7 +87,8 @@ node tools/selftest.mjs                      # 假 DOM 冒烟，必须 FAIL 0
 node tools/install.mjs --profile desktop     # 只有上一步 exit=0 才允许跑
 ```
 
-在 `dsh-boot-gallery/` 下：`node tools/selftest.mjs`（服务端）与 `node tools/selftest-client.mjs`（客户端）。
+在 `dsh-boot-gallery/` 下：`node tools/selftest.mjs`（服务端）、`node tools/selftest-client.mjs`（客户端）、
+`node tools/install.mjs --profile desktop`（安装）。
 
 素材包侧还有两条：
 
