@@ -32,7 +32,26 @@ for (const p of targets) if (p !== 'web' && p !== 'desktop') { console.error('�
 const dry = process.argv.includes('--dry')
 const HOME = process.env.DSH_HOME || path.join(os.homedir(), '.dsh')
 const FILES = ['package.json', 'lib/index.js', 'lib/client.js']
+// 随插件分发的**自有主题素材**(2026-11-22)。
+// 用户定案:清寒/暖秋/夜潮三套是自己画的,随插件走,装完就该能用。
+// ⚠ 光把 arts-builtin 放进仓库是不够的 —— 上面那段 `fs.rmSync(DEST)` 会把 DEST 整个删掉重建,
+//   不在这里一起拷过去,装机目录里就只剩 package.json + lib,
+//   而"随插件分发"这句承诺就是空的(实测确实漏了,装机目录里没有 arts-builtin)。
+const BUILTIN = 'arts-builtin'
+const BUILTIN_FILES = (function walk(rel) {
+  const abs = path.join(PKGROOT, ...rel.split('/'))
+  if (!fs.existsSync(abs)) return []
+  const out = []
+  for (const e of fs.readdirSync(abs, { withFileTypes: true })) {
+    const sub = rel + '/' + e.name
+    if (e.isDirectory()) out.push(...walk(sub))
+    else out.push(sub)
+  }
+  return out
+})(BUILTIN)
 const sha = (b) => createHash('sha256').update(b).digest('hex').slice(0, 12)
+if (BUILTIN_FILES.length) console.log('  src ' + (BUILTIN + '/').padEnd(14) + String(BUILTIN_FILES.length).padStart(3) + ' 个文件(随插件分发的自有主题)')
+else console.log('  !! 没有 ' + BUILTIN + '(自带主题缺失,装完只剩代码)')
 
 // 源文件先自审一遍:BOM 会让宿主静默跳过 dsh.client(装机失败最常见的一条)
 for (const rel of FILES) {
@@ -73,6 +92,22 @@ for (const prof of targets) {
       const b = sha(fs.readFileSync(path.join(DEST, ...rel.split('/'))))
       if (a !== b) { console.error('!! 装机副本 ' + rel + ' 与源摘要不一致(' + a + ' vs ' + b + ')'); process.exit(1) }
     }
+    // 自带主题素材:逐文件复制 + 逐文件核摘要。
+    // 素材是**二进制且体积大**,拷一半不会报错,只会让面板上出现一格"坏:…"(静默),
+    // 所以必须像代码一样逐个比摘要。
+    for (const rel of BUILTIN_FILES) {
+      const to = path.join(DEST, ...rel.split('/'))
+      fs.mkdirSync(path.dirname(to), { recursive: true })
+      fs.copyFileSync(path.join(PKGROOT, ...rel.split('/')), to)
+    }
+    let bad = 0
+    for (const rel of BUILTIN_FILES) {
+      const a = sha(fs.readFileSync(path.join(PKGROOT, ...rel.split('/'))))
+      const b = sha(fs.readFileSync(path.join(DEST, ...rel.split('/'))))
+      if (a !== b) { console.error('!! 自带素材 ' + rel + ' 摘要不一致'); bad++ }
+    }
+    if (bad) process.exit(1)
+    if (BUILTIN_FILES.length) say('自带主题 ' + BUILTIN_FILES.length + ' 个文件已装并核摘要')
     console.log('      三件源文件摘要 == 三份装机副本摘要 ✓')
   }
   for (const rel of FILES) {

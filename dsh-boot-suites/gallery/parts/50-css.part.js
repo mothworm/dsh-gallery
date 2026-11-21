@@ -188,22 +188,32 @@ const shellCss = [
 	//     真磨砂玻璃的质感来自"细碎的不规则",靠模糊是模拟不出来的,
 	//     只有 blur 的玻璃永远像"半透明塑料"。
 	//   · 再补一层低饱和的**冷白高光**,模拟光在毛面上的散射。
+	//
+	// ── 2026-11-22 第二轮:用户「还是再透一点(像磨砂亚克力)」 ──
+	// 方向明确:要**更透**,但要保住磨砂感。磨砂亚克力的特征:
+	//   · 能**清楚**看见背后的东西(不像毛玻璃那样只有个轮廓)  ⇒ 底色再降 + 模糊再降
+	//   · 表面仍有均匀的细颗粒(不是镜面)                      ⇒ 颗粒层保留,略降一点
+	//   · 有一道**亮边**(亚克力的切割边缘反光很强)             ⇒ 外边 ring 加亮
+	// 具体:底色 58%→**38%**,模糊 0.14→**0.10px/级**(fog=100 时 10px),
+	//       颗粒 0.009→0.0075(略微收一点,免得"透"了之后显得脏)。
 	"background-color:color-mix(in srgb,",
-	"var(--bs-glass-tint,transparent) calc(var(--bs-glass-fog,34) * 0.62%),",
-	"var(--dsw-alias-bg-layer-2) calc(58% - var(--bs-glass-fog,34) * 0.22%));",
+	"var(--bs-glass-tint,transparent) calc(var(--bs-glass-fog,34) * 0.50%),",
+	"var(--dsw-alias-bg-layer-2) calc(38% - var(--bs-glass-fog,34) * 0.16%));",
 	"background-image:linear-gradient(168deg,",
-	"color-mix(in srgb,var(--dsw-alias-bg-layer-2) calc(24% + var(--bs-glass-fog,34) * 0.34%),transparent),",
-	"color-mix(in srgb,var(--dsw-alias-bg-layer-1) calc(18% + var(--bs-glass-fog,34) * 0.30%),transparent),",
+	"color-mix(in srgb,var(--dsw-alias-bg-layer-2) calc(16% + var(--bs-glass-fog,34) * 0.22%),transparent),",
+	"color-mix(in srgb,var(--dsw-alias-bg-layer-1) calc(12% + var(--bs-glass-fog,34) * 0.20%),transparent),",
 	// 冷白散射光:左上打过来的漫射,磨砂面才有这种"发白发灰"的观感
-	"linear-gradient(160deg,rgba(255,255,255,calc(var(--bs-glass-fog,34) * 0.0016)) 0%,",
-	"rgba(255,255,255,0) 42%,rgba(255,255,255,calc(var(--bs-glass-fog,34) * 0.0009)) 100%));",
-	// 模糊:上限 14px。0.14px/级 —— 够柔化,又保得住"背后有画面"这条。
-	"backdrop-filter:blur(calc(var(--bs-glass-fog,34) * 0.14px)) saturate(calc(100% + var(--bs-glass-fog,34) * 0.20%)) brightness(calc(100% + var(--bs-glass-fog,34) * 0.06%));",
-	"-webkit-backdrop-filter:blur(calc(var(--bs-glass-fog,34) * 0.14px)) saturate(calc(100% + var(--bs-glass-fog,34) * 0.20%)) brightness(calc(100% + var(--bs-glass-fog,34) * 0.06%));",
+	"linear-gradient(160deg,rgba(255,255,255,calc(var(--bs-glass-fog,34) * 0.0014)) 0%,",
+	"rgba(255,255,255,0) 42%,rgba(255,255,255,calc(var(--bs-glass-fog,34) * 0.0008)) 100%));",
+	// 模糊:上限 10px。0.10px/级 —— 亚克力比毛玻璃清楚得多,只是"不够锐"。
+	"backdrop-filter:blur(calc(var(--bs-glass-fog,34) * 0.10px)) saturate(calc(100% + var(--bs-glass-fog,34) * 0.16%)) brightness(calc(100% + var(--bs-glass-fog,34) * 0.05%));",
+	"-webkit-backdrop-filter:blur(calc(var(--bs-glass-fog,34) * 0.10px)) saturate(calc(100% + var(--bs-glass-fog,34) * 0.16%)) brightness(calc(100% + var(--bs-glass-fog,34) * 0.05%));",
 	// 玻璃边缘:外圈一道亮边 + 内圈一道暗边 = 厚玻璃的"边缘折射"
-	"box-shadow:0 0 0 1px rgba(255,255,255,.20),0 1px 2px rgba(0,0,0,.20),",
-	"0 14px 34px -16px rgba(0,0,0,.50),inset 0 1px 0 rgba(255,255,255,.16),",
-	"inset 0 -1px 0 rgba(0,0,0,.10);",
+	// 2026-11-22:外边从 .20 提到 **.30**,内高光 .16→.22 —— 亚克力越透,
+	// 边缘反光就越关键:它是"这是一块板"的唯一线索,没有它整块就显得"没边"。
+	"box-shadow:0 0 0 1px rgba(255,255,255,.30),0 1px 2px rgba(0,0,0,.22),",
+	"0 16px 38px -18px rgba(0,0,0,.52),inset 0 1px 0 rgba(255,255,255,.22),",
+	"inset 0 -1px 0 rgba(0,0,0,.12);",
 	"position:relative;",
 	"}",
 	// ── 颗粒层:这才是「磨砂」的质感来源 ──
@@ -226,8 +236,10 @@ const shellCss = [
 	"pointer-events:none;z-index:0;",
 	"background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)' opacity='0.72'/%3E%3C/svg%3E\");",
 	"background-repeat:repeat;background-size:160px 160px;",
-	// 颗粒强度吃 fog:0 = 完全看不见,100 = 明显的磨砂面
-	"opacity:calc(var(--bs-glass-fog,34) * 0.009);",
+	// 颗粒强度吃 fog:0 = 完全看不见,100 = 明显的磨砂面。
+	// 2026-11-22 从 0.009 收到 0.0075:底色降到 38% 之后,背景本身更清楚,
+	// 颗粒就不用那么重;太重会在"透"的底子上显得脏(像屏幕有灰)。
+	"opacity:calc(var(--bs-glass-fog,34) * 0.0075);",
 	"mix-blend-mode:overlay;",
 	"}",
 	"}",

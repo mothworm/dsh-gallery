@@ -23,7 +23,15 @@ const HERE = path.dirname(fileURLToPath(import.meta.url))
 // HERE = <repo>/dsh-boot-suites/gallery/tools -> 上跳三级才是仓库根
 // (第一版只跳了两级,算出来的源路径是 <repo>/dsh-boot-suites/dsh-gallery-pack/…,报"缺素材源")
 const REPO = path.resolve(HERE, '..', '..', '..')
-const SRC = path.join(REPO, 'dsh-gallery-pack', 'arts-scenery')
+// 素材源优先取**插件包里自带的那份**(arts-builtin)。
+//
+// 2026-11-22 改:用户要求「git/插件里只带夜潮/暖秋/清寒这几个咱们画的不需要申请版权的主题」。
+// 那三套就不该只躺在 dsh-gallery-pack(被 .gitignore 挡着、也不随插件分发),
+// 而应该**跟着插件走**:装完插件就已经能用,不需要另外下载素材包。
+// dsh-gallery-pack/arts-scenery 保留作**生成产物**(由 pack-scenery.py 产出),这里退成兜底。
+const PKG_ARTS = path.join(HERE, '..', 'arts-builtin')
+const PACK_ARTS = path.join(REPO, 'dsh-gallery-pack', 'arts-scenery')
+const SRC = existsSync(PKG_ARTS) && readdirSync(PKG_ARTS).length ? PKG_ARTS : PACK_ARTS
 const HOME = process.env.DSH_HOME || path.join(os.homedir(), '.dsh')
 const DEST = path.join(HOME, 'boot-naruto', 'arts')
 const dry = process.argv.includes('--dry')

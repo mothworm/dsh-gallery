@@ -156,25 +156,48 @@ for needle, why in [("arts2", "必须写明 arts2→arts 这层改名"),
     ok(needle in tip, "提示词里有「%s」—— %s" % (needle, why))
 ok("%USERPROFILE%" in tip or "$env:USERPROFILE%" in tip, "提示词用 %USERPROFILE% 而不是把我这台机的用户名写死")
 
-# —— 素材边界(2026-11-21 定案,用户拍板)——
-# 现在的分工是:
-#   · **随插件走的**:我们自己用 ComfyUI 画的风景图(源在 arts-scenery,无第三方权利);
-#   · **随素材包走的**:火影那 17 套;
-#   · **不放的**:鲸鱼娘 —— 它的插画是 CC BY-NC-SA 4.0,与"插件进 GitHub/市场"冲突,已整套撤下。
-# 这条断言守的是"边界没被悄悄破坏":仓库里不许出现任何资源包素材本体。
-# 判据用 git ls-files 而不是 os.walk —— 后者会把 .gitignore 挡掉的东西也算进来。
+# —— 素材边界(2026-11-22 定案,用户拍板)——
+# 分工:
+#   · **随插件走**:清寒/暖秋/夜潮 三套自画风景 → dsh-boot-suites/gallery/arts-builtin/
+#   · **随素材包走**:火影那 17 套 → arts2/,不进 git
+#   · **不放**:鲸鱼娘(CC BY-NC-SA 与 BSD-3 冲突,已整套撤下)
+#
+# 这条断言守的是"边界没被悄悄破坏"。判据用 git ls-files,
+# 因为它反映的正是**别人 clone 下来会拿到什么**,比 os.walk 准。
 try:
     import subprocess
-    _repo = os.path.dirname(os.path.dirname(PACK))
+    # PACK = <repo>/dsh-gallery-pack  ⇒ 上跳**两级**才是仓库根。
+    # ⚠ 2026-11-22 修:原来写的是 dirname(dirname(PACK)),那是 <工作区的父目录>(D:\projects),
+    #   在那里跑 git ls-files 得到**空列表**,于是"没有媒体文件"这条**永远绿** ——
+    #   一个恒真断言比没有断言更糟,它会让人以为边界有人守着。
+    #   现在算完立刻自检:拿不到任何被跟踪文件就直接报红,而不是静默放行。
+    _repo = os.path.dirname(PACK)
     _tracked = subprocess.run(["git", "ls-files"], cwd=_repo,
-                              capture_output=True, text=True, timeout=30).stdout
-    # 只认"素材本体"(图片/压缩包),脚本与说明照旧可以进仓库。
+                              capture_output=True, text=True, timeout=30).stdout.splitlines()
+    ok(len(_tracked) > 0,
+       "能在仓库根读到被跟踪的文件(读到 %d 个;为 0 说明仓库根算错了,下面的边界检查会全部失真)" % len(_tracked))
+    if not _tracked:
+        raise RuntimeError("repo root unreachable")
     _media = re.compile(r"\.(png|jpe?g|webp|gif|mp4|psd|zip)$", re.I)
-    _leak = [ln for ln in _tracked.splitlines()
-             if _media.search(ln) and ("arts-scenery" in ln or "arts-whalegirl" in ln or "arts2" in ln)]
-    ok(not _leak, "代码仓库里没有混进资源包素材本体(漏进 %d 个: %s)" % (len(_leak), _leak[:3]))
-    # 鲸鱼娘既然撤了,就断言它真的不在 —— 免得哪天半套残留(图删了、脚本还在)。
-    _wl = [ln for ln in _tracked.splitlines() if "whalegirl" in ln.lower()]
+    _media_files = [ln for ln in _tracked if _media.search(ln)]
+
+    # ① 火影/资源包素材本体不许进仓库。
+    #    ⚠ 2026-11-22 修:原来只查 "arts-scenery|arts-whalegirl|arts2" 这几个键,
+    #    新开的 arts-builtin 完全不在它的视野里 —— 那条断言在素材真的入仓后**仍然全绿**,
+    #    等于没在守。改成反过来的写法:**除 arts-builtin 之外,一个媒体文件都不许有**。
+    _outside = [ln for ln in _media_files if "arts-builtin" not in ln.replace("\\", "/")]
+    ok(not _outside, "仓库里的媒体文件只在 arts-builtin 内(越界 %d 个: %s)" % (len(_outside), _outside[:3]))
+
+    # ② arts-builtin 必须**真的存在且齐全** —— 它是"随插件分发、装完就能用"的唯一凭据。
+    #    缺了它,用户装完插件只会看到一片"没有主题"。
+    _builtin = [ln for ln in _media_files if "arts-builtin" in ln.replace("\\", "/")]
+    _ids = sorted(set(ln.replace("\\", "/").split("arts-builtin/")[1].split("/")[0]
+                      for ln in _builtin if "arts-builtin/" in ln.replace("\\", "/")))
+    ok(sorted(_ids) == ["scenery-cool", "scenery-dark", "scenery-warm"],
+       "arts-builtin 恰好是自画的三套(实际 %s)" % (_ids,))
+
+    # ③ 鲸鱼娘既然撤了,就断言它真的不在 —— 免得哪天半套残留(图删了、脚本还在)。
+    _wl = [ln for ln in _tracked if "whalegirl" in ln.lower()]
     ok(not _wl, "鲸鱼娘已整套撤下(仓库里残留 %d 个: %s)" % (len(_wl), _wl[:3]))
 except Exception as _e:
     ok(True, "跳过 git 边界检查(%s) —— 不在 git 仓库里跑时是正常的" % type(_e).__name__)

@@ -18,9 +18,13 @@
   **在悬浮球面板里选一次，两处一起换**（这不是两件事）。
 - **轮播**：主题可按时间自动换（到点切下一套）；壁纸可在**当前这套**的几张图之间自动换，
   也可以点「下一张」手动换。
-- **磨砂玻璃文本框**：聊天卡片底色是真正的 `backdrop-filter` 磨砂玻璃，颜色与雾感两个旋钮可调。
-- **资源包可导入**：主题素材不在本仓库。用 `dsh-gallery-pack/tools/import-theme.py`
+- **磨砂玻璃文本框**：聊天卡片底色是真正的 `backdrop-filter` 磨砂玻璃（底面另有 SVG 噪声颗粒层），
+  颜色与雾感两个旋钮可调。默认取向是**磨砂亚克力**——能看见背后的画，只是不锐利。
+- **自带三套主题**：清寒 / 暖秋 / 夜潮，随插件分发（`dsh-boot-suites/gallery/arts-builtin/`），
+  **装完就能用**，不需要另外找素材。
+- **素材包可导入**：火影那 17 套不在本仓库。用 `dsh-gallery-pack/tools/import-theme.py`
   把一套（或一个 zip 里的多套）导进 `%USERPROFILE%\.dsh\boot-naruto\arts\`，刷新面板即可见。
+  一步步的可验证流程见 [素材包导入指南](dsh-gallery-pack/素材包导入指南.md)。
 
 ## 为什么两个包放一个仓库
 
@@ -30,10 +34,17 @@
 但**它们仍然是两次安装**：各自的 `package.json`、各自的 `cordis.patch.yml`、各自装进
 `%USERPROFILE%\.dsh\profiles\desktop\node_modules\`。合仓不等于合体。
 
-## 这个仓库里一个字节素材都没有
+## 仓库里的素材：只有我们自己画的三套
 
-- 截至 2026-11-21：**媒体类 0**。复查：`git ls-files | grep -Ei '\.(png|jpe?g|webp|gif|mp4|psd|zip)$'` 应为空。
-- 开屏分镜图**不内嵌**在 `client.js` 里，是运行时从 `%USERPROFILE%\.dsh\boot-naruto\arts\` 取；
+- 截至 2026-11-22：**媒体类 15 个，全部在 `dsh-boot-suites/gallery/arts-builtin/`**。
+  复查：`git ls-files | grep -Ei '\.(png|jpe?g|webp|gif|mp4|psd|zip)$'`，
+  输出里只应出现 `arts-builtin/{scenery-cool,scenery-warm,scenery-dark}/` 下的文件。
+- 为什么开这个口子：那三套是**我们自己用 ComfyUI 生成的风景**，不含任何他人角色或美术作品，
+  随插件分发不涉及授权问题；而"装完插件就能用"是基本体验。
+  `.gitignore` 里的例外是**目录限定**的（`!/arts-builtin/`），**不是** `!*.jpg` ——
+  后者会把火影素材、参考图、截图稿一起放进仓库。
+- **火影那 17 套不在这里**：角色与画面版权归各自权利人，随私有素材包单独投放。
+- 开屏分镜图**不内嵌**在 `client.js` 里，是运行时从 `%USERPROFILE%\.dsh\boot-naruto\arts\` 取。
   那些图连同各预设分镜、开机视频都在**私有素材包**里，另行投放，不进版本库。
   （11-14 时 `lib\client.js` 真的内嵌过 1.33 MB base64 JPEG，所以那时整目录禁止提交；
   这条前提已经失效，复核口径写在 [dsh-boot-gallery/.gitignore](dsh-boot-gallery/.gitignore) 顶部。）
