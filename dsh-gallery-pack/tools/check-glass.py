@@ -96,8 +96,22 @@ def main():
     # ② 雾感进 calc
     chk("② 雾感旋钮真的进 calc()(拖滑块会改变效果)",
         re.search(r"blur\(calc\(var\(--bs-glass-fog", css) is not None, "")
+    # ⚠ 2026-11-21 改判据:原来写死 `fog * \d+%`(整数系数)。
+# 用户反馈"雾感拉满也不像磨砂"之后,底色系数从 1%(fog=100 时宿主底色 100% 不透明,
+# 等于把背景彻底盖死)降到 0.62%。判据改成**语义化**:fog 只要以带小数的系数
+# 参与不透明度计算即可;钉字面整数会在每次调参时假红。
     chk("②b 雾感同时驱动底色不透明度",
-        re.search(r"var\(--bs-glass-fog,\d+\) \* \d+%\)", css) is not None, "")
+        re.search(r"var\(--bs-glass-fog,\d+\) \* \d*\.?\d+%\)", css) is not None, "")
+
+    # ②c 颗粒层 —— 用户"不像磨砂"的真因。
+    # 只有 blur 的玻璃永远像**半透明塑料**:光滑、均匀、是个色块。
+    # 真磨砂玻璃表面有无数细凹凸,光随机散射,近看有细碎明暗噪点。
+    chk("②c 有颗粒层(feTurbulence 噪声)—— 「磨砂」而非「半透明塑料」的关键",
+        "feTurbulence" in css and "fractalNoise" in css, "")
+    # ②d 颗粒层绝不能吃掉文字:它必须是纯装饰层,而且卡片内容要抬到它上面。
+    # (可读性是本项目的红线,这一条比"好不好看"更硬。)
+    chk("②d 颗粒层纯装饰(pointer-events:none)+ 卡片内容抬到 z-index 之上",
+        "pointer-events:none" in css and re.search(r"\*\{position:relative;z-index:1\}", css) is not None, "")
 
     # ③ 颜色进 color-mix
     chk("③ 颜色旋钮真的进 color-mix()",

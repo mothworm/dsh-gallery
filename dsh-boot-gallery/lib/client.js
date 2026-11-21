@@ -493,11 +493,17 @@ window.__ModuleLoader__.load({
 			v.setAttribute("muted", ""); v.setAttribute("autoplay", ""); v.setAttribute("playsinline", "");
 			root.appendChild(v);
 			const hint = el("bgl-skip");
-			hint.textContent = "点击开声音/全屏 · Esc 跳过";
+			// 2026-11-21 用户:「主题和开机画面是没有声音的,点击开声音就别写了」。
+			// 核实属实:本项目的主题全是**静态图分镜**,不播音频;
+			// 只有 preset.json 写了 "clip" 才会走到这条 playVideo() 分支(当前一套都没有),
+			// 所以"点击开声音"这句提示对真实用户是**永远不会应验的**。
+			// 连点击里那句 `v.muted = false` 一起去掉 —— 留着一个开声音的动作配一行不说话的提示,只会让人以为坏了。
+			// (全屏也一并去掉:开机是自动播完就进去的,没有"用户要全屏看"这个场景。)
+			hint.textContent = "Esc 跳过";
 			root.appendChild(hint);
 			root.addEventListener("click", () => {
-				if (v.muted) { v.muted = false; const pr = v.play(); if (pr && pr.catch) pr.catch(() => {}); }
-				if (!document.fullscreenElement && typeof v.requestFullscreen === "function") { try { v.requestFullscreen().catch(() => {}); } catch (e) {} }
+				// 点一下 = 跳过,这是唯一有意义的动作
+				finish();
 			});
 			v.addEventListener("ended", () => finish());
 			v.addEventListener("error", () => setTimeout(finish, 600));

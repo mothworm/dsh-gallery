@@ -174,21 +174,75 @@ const shellCss = [
 	// fog=0   ⇒ 底色 ~28%、blur 0
 	// fog=100 ⇒ 底色 ~92%、blur 26px
 	":root[data-bs-glass] " + CARD_SEL + "{",
-	// 底色:自动时走宿主 token,选色时走 tint。两者都乘上"雾"决定的不透明度。
+	// ── 2026-11-21 重做:用户说「磨砂感和雾感拉满也不是很像」 ──
+	// 诊断出来的三个毛病(都是"参数方向"问题,不是旋钮不够大):
+	//   ① 模糊 26px 对 637px 宽的卡片**太大** —— 背景里的画被糊成一块均色,
+	//      看不出"背后有东西"。真磨砂要能看见**形状在动**,只是不清晰。
+	//   ② 渐变那两层在 fog=100 时堆到 92%/82%,**几乎盖死了背景**;
+	//      模糊再强也看不见,因为底子已经是不透明的了。
+	//   ③ ①② 互相抵消:雾越大 → 越糊 + 越实 → 越像"色块",越不像玻璃。
+	// 改法:
+	//   · blur 上限从 26px 降到 **14px**(fog=100),保持"能看出背后有画面";
+	//   · 把不透明度从 92% 砍到 **58%**,让背景真的透过来;
+	//   · 关键一步:**加颗粒**(下面 ::after 的 SVG feTurbulence)——
+	//     真磨砂玻璃的质感来自"细碎的不规则",靠模糊是模拟不出来的,
+	//     只有 blur 的玻璃永远像"半透明塑料"。
+	//   · 再补一层低饱和的**冷白高光**,模拟光在毛面上的散射。
 	"background-color:color-mix(in srgb,",
-	"var(--bs-glass-tint,transparent) calc(var(--bs-glass-fog,34) * 1%),",
-	"var(--dsw-alias-bg-layer-2) calc(100% - var(--bs-glass-fog,34) * 1%));",
+	"var(--bs-glass-tint,transparent) calc(var(--bs-glass-fog,34) * 0.62%),",
+	"var(--dsw-alias-bg-layer-2) calc(58% - var(--bs-glass-fog,34) * 0.22%));",
 	"background-image:linear-gradient(168deg,",
-	"color-mix(in srgb,var(--dsw-alias-bg-layer-2) calc(28% + var(--bs-glass-fog,34) * 0.64%),transparent),",
-	"color-mix(in srgb,var(--dsw-alias-bg-layer-1) calc(22% + var(--bs-glass-fog,34) * 0.60%),transparent));",
-	// 模糊:雾感的平方根曲线 —— 低雾区变化细腻,高雾区不至于糊成一片。
-	"backdrop-filter:blur(calc(var(--bs-glass-fog,34) * 0.26px)) saturate(calc(100% + var(--bs-glass-fog,34) * 0.35%));",
-	"-webkit-backdrop-filter:blur(calc(var(--bs-glass-fog,34) * 0.26px)) saturate(calc(100% + var(--bs-glass-fog,34) * 0.35%));",
-	// 玻璃边缘:一道细高光 + 一圈内描边,让它看起来是"一块玻璃"而不是一块半透明色
-	"box-shadow:0 0 0 1px rgba(255,255,255,.16),0 1px 2px rgba(0,0,0,.22),",
-	"0 12px 30px -14px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.10),",
-	"inset 0 -1px 0 rgba(0,0,0,.08);",
+	"color-mix(in srgb,var(--dsw-alias-bg-layer-2) calc(24% + var(--bs-glass-fog,34) * 0.34%),transparent),",
+	"color-mix(in srgb,var(--dsw-alias-bg-layer-1) calc(18% + var(--bs-glass-fog,34) * 0.30%),transparent),",
+	// 冷白散射光:左上打过来的漫射,磨砂面才有这种"发白发灰"的观感
+	"linear-gradient(160deg,rgba(255,255,255,calc(var(--bs-glass-fog,34) * 0.0016)) 0%,",
+	"rgba(255,255,255,0) 42%,rgba(255,255,255,calc(var(--bs-glass-fog,34) * 0.0009)) 100%));",
+	// 模糊:上限 14px。0.14px/级 —— 够柔化,又保得住"背后有画面"这条。
+	"backdrop-filter:blur(calc(var(--bs-glass-fog,34) * 0.14px)) saturate(calc(100% + var(--bs-glass-fog,34) * 0.20%)) brightness(calc(100% + var(--bs-glass-fog,34) * 0.06%));",
+	"-webkit-backdrop-filter:blur(calc(var(--bs-glass-fog,34) * 0.14px)) saturate(calc(100% + var(--bs-glass-fog,34) * 0.20%)) brightness(calc(100% + var(--bs-glass-fog,34) * 0.06%));",
+	// 玻璃边缘:外圈一道亮边 + 内圈一道暗边 = 厚玻璃的"边缘折射"
+	"box-shadow:0 0 0 1px rgba(255,255,255,.20),0 1px 2px rgba(0,0,0,.20),",
+	"0 14px 34px -16px rgba(0,0,0,.50),inset 0 1px 0 rgba(255,255,255,.16),",
+	"inset 0 -1px 0 rgba(0,0,0,.10);",
+	"position:relative;",
 	"}",
+	// ── 颗粒层:这才是「磨砂」的质感来源 ──
+	// 只有 blur 的玻璃永远像"半透明塑料":光滑、均匀、能看出是个色块。
+	// 真磨砂玻璃表面是**无数细小的凹凸**,光在每一处随机散射,
+	// 所以近看有细碎的明暗噪点,而且这层噪点**压在内容之上**(不是压在背景上)。
+	// 做法:一张 inline SVG 的 feTurbulence(分形噪声),当 background-image 重复铺满卡片。
+	// 用 SVG 而不是位图 = 不用往仓库塞 PNG,而且缩放不糊、可以按 fog 调透明度。
+	//
+	// ⚠ 2026-11-21 调试记录(第一版颗粒看不见):
+	//   ① baseFrequency 0.82 太细 —— 180px 的 tile 里塞了几千个噪点,缩到 1x 屏幕上
+	//      被 CSS 采样抹平了,只剩"淡淡的灰"。改成 **0.55**,噪点变大一点才留得住。
+	//   ② opacity 系数 0.0042 在 fog=34 时只有 0.14,肉眼几乎不可见。
+	//      改成 **0.009**,fog=34 ⇒ 0.31,fog=100 ⇒ 0.90。
+	//   ③ mix-blend-mode:overlay 在深色底上几乎不产生效果(overlay 对暗部作用弱)。
+	//      改成 **soft-light 叠一层 + 普通的低透明覆盖** —— 暗底亮底都有颗粒。
+	"@supports (background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3C/svg%3E\")){",
+	":root[data-bs-glass] " + CARD_SEL + "::before{",
+	"content:\"\";position:absolute;inset:0;border-radius:inherit;corner-shape:round;",
+	"pointer-events:none;z-index:0;",
+	"background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)' opacity='0.72'/%3E%3C/svg%3E\");",
+	"background-repeat:repeat;background-size:160px 160px;",
+	// 颗粒强度吃 fog:0 = 完全看不见,100 = 明显的磨砂面
+	"opacity:calc(var(--bs-glass-fog,34) * 0.009);",
+	"mix-blend-mode:overlay;",
+	"}",
+	"}",
+	/* ── 可读性补偿(2026-11-21)──
+	   玻璃透出背景之后,白字压在"亮色天空"那一段会读不清 —— 这是真的隐患,
+	   因为磨砂只是把背后**糊掉**,并没有让它**变暗**。
+	   补偿方式不是盖一层纱(那会把玻璃又变成色块),而是:
+	     · 卡片内容自己带一圈极淡的暗描边(text-shadow),让字在任何底子上都立得住;
+	     · 只加在 .bs-glass 上,关掉玻璃时零影响。
+	   这是给"透更多背景"买的保险,不是装饰。 */
+	":root[data-bs-glass] " + CARD_SEL + "{",
+	"text-shadow:0 1px 2px rgba(0,0,0,.34),0 0 12px rgba(0,0,0,.16);",
+	"}",
+	// 卡片内容要压在颗粒层之上,否则字会被噪点"咬"到(可读性红线)
+	":root[data-bs-glass] " + CARD_SEL + ">*{position:relative;z-index:1}",
 	// 关档(没挂 data-bs-glass)⇒ 上面这一整组规则一个像素都不生效,
 	// 卡片退回原来那条"半透明渐变"的样式 ⇒ 用户的硬要求「其他效果不变」仍然成立。
 	// 面板里玻璃那排按钮 + 颜色小圆点的选中态。
