@@ -127,13 +127,17 @@ def main():
                     continue
                 z.write(p, "%s/%s" % (name, f))
                 entries.append("%s/%s" % (name, f))
-        # 文档:导入指南 + 索引
-        for doc_name in ("导入指南.md", "给朋友的提示词.md"):
+        # 文档:导入指南 + 给朋友的提示词 + 索引
+        # ⚠ 2026-11-22:改发 **.txt**。用户:「不是谁都装 typora」——
+        # .md 在没装 Markdown 工具的 Windows 上会被记事本当纯文本打开、满屏 # 和 |。
+        # 给朋友的包要"双击就能读",所以用 .txt。
+        for doc_name in ("导入指南.txt", "给朋友的提示词.txt"):
             p = os.path.join(PACK, doc_name)
             if os.path.isfile(p):
                 z.write(p, doc_name)
                 entries.append(doc_name)
-        for idx in ("INDEX.md", "INDEX.json"):
+        # 索引:包里带 txt(人看) + json(程序看);md 那份是给我们自己看的,不进包
+        for idx in ("INDEX.txt", "INDEX.json"):
             p = os.path.join(SRC, idx)
             if os.path.isfile(p):
                 z.write(p, idx)

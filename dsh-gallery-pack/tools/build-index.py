@@ -195,7 +195,36 @@ def main():
     with io.open(os.path.join(args.arts, "INDEX.md"), "w", encoding="utf-8", newline="\n") as f:
         f.write("\n".join(lines))
 
-    print("已写 INDEX.json / INDEX.md")
+    # —— INDEX.txt:与 INDEX.md 同内容,但去掉 Markdown 记号 ——
+    # 2026-11-22 用户:「不是谁都装 typora」。给朋友的包里带 .txt,
+    # 双击记事本就能对齐读;.md 满屏 # 和 | 会让人以为文件坏了。
+    t = ["素材包索引", "=" * 60, "",
+         "共 %d 套,%.1f MB。由 dsh-gallery-pack/tools/build-index.py 生成。" % (len(entries), total_bytes / 1048576.0), "",
+         "开机画面 = 桌面主题(同一批图,选一套两处一起换)。",
+         "悬浮球 = eye.photo 指向的图;没写的用程序画的图案。", ""]
+    t.append("%-16s %-16s %4s  %-18s %10s" % ("目录名", "名称", "幕数", "球心", "字节"))
+    t.append("-" * 74)
+    for e in entries:
+        t.append("%-16s %-16s %4d  %-18s %10s" % (
+            e["id"], e["title"], e["acts"],
+            e["eye"].get("photo") or "手绘:" + e["eye"]["kind"], format(e["bytes"], ",")))
+    t += ["", "每套的文件清单", "=" * 60, ""]
+    for e in entries:
+        t.append("%s  (%s)" % (e["title"], e["id"]))
+        t.append("  preset.json, %d 幕" % e["acts"])
+        for s in e["shots"]:
+            t.append("    %-10s %10s B  sha256:%s" % (s["file"], format(s["bytes"], ","), s["sha12"]))
+        if e["eye"].get("photo"):
+            t.append("    %-10s %10s B  sha256:%s  <- 悬浮球图案 (%s)"
+                     % (e["eye"]["photo"], format(e["eye"].get("bytes") or 0, ","),
+                        e["eye"].get("sha12") or "-", e["eye"]["kind"]))
+        else:
+            t.append("    悬浮球:程序画的图案 (%s)" % e["eye"]["kind"])
+        t.append("")
+    with io.open(os.path.join(args.arts, "INDEX.txt"), "w", encoding="utf-8", newline="\r\n") as f:
+        f.write("\n".join(t))
+
+    print("已写 INDEX.json / INDEX.md / INDEX.txt")
     if bad:
         print("\n⚠ 有 %d 套存在问题,上面的表格已点名。补齐后再生成一次。" % len(bad))
         return 1
