@@ -202,5 +202,44 @@ try:
 except Exception as _e:
     ok(True, "跳过 git 边界检查(%s) —— 不在 git 仓库里跑时是正常的" % type(_e).__name__)
 
+# —— ④ 随仓库分发的图不许带生成元数据(2026-11-22 公开前审计) ——
+# 实测:这 12 张 JPEG 的 `prompt` 字段里塞着 ComfyUI 的完整生成参数,
+# 含本机模型目录名(SDXL\SDXLFaetastic_v24.safetensors)。不是隐私,但没必要公开。
+# 用 Pillow 查;没装 Pillow 就跳过(不让这条挡住别人的环境)。
+try:
+    import glob as _glob
+    # __file__ = <repo>/dsh-gallery-pack/tools/selftest-pack.py
+    #   dirname        -> .../dsh-gallery-pack/tools
+    #   ../..          -> <repo>              ← 上跳两级到仓库根,再进 dsh-boot-suites
+    # ⚠ 第一版写了三个 dirname,算到 <repo>/dsh-gallery-pack 上去了,
+    #   于是 glob 到 0 张图 → 断言走 else 分支"没有图,跳过" ⇒ **静默跳过等于没查**。
+    #   现在:真的找不到图就报红,不许静默放行。
+    _here = os.path.dirname(os.path.abspath(__file__))
+    _arts = os.path.join(_here, "..", "..", "dsh-boot-suites", "gallery", "arts-builtin")
+    _arts = os.path.normpath(_arts)
+    _imgs = sorted(_glob.glob(os.path.join(_arts, "*", "*.jpg")) +
+                   _glob.glob(os.path.join(_arts, "*", "*.png")))
+    ok(len(_imgs) > 0, "在 arts-builtin 找到随包分发的图(找到 %d 张;为 0 说明路径算错,下面的元数据检查会失真)" % len(_imgs))
+    if _imgs:
+        try:
+            import sys as _sys
+            _sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(
+                os.path.dirname(os.path.abspath(__file__)))), "_pylibs"))
+            from PIL import Image as _Image
+            _risky = ("prompt", "workflow", "parameters")
+            _dirty = []
+            for _p in _imgs:
+                _im = _Image.open(_p)
+                if any(k in (_im.info or {}) for k in _risky):
+                    _dirty.append(os.path.basename(_p))
+            ok(not _dirty, "随仓库分发的图不带生成元数据(prompt/workflow;脏 %d 张: %s)"
+               % (len(_dirty), _dirty[:3]))
+        except ImportError:
+            ok(True, "跳过元数据检查(没装 Pillow)")
+    else:
+        ok(True, "arts-builtin 下没有图,跳过元数据检查")
+except Exception as _e:
+    ok(True, "跳过元数据检查(%s)" % type(_e).__name__)
+
 print("\n断言 %d,FAIL %d%s" % (ok_n, len(fails), "，全绿" if not fails else ""))
 sys.exit(0 if not fails else 1)
