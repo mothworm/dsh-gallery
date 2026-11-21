@@ -601,6 +601,15 @@ console.log('\n[5b] 面板文字必须**算**出来,不是靠 opacity 蒙')
     '产物里没有裸的 eyeUri(pal) 调用(那条等于把 unknown 塞进手绘)')
   ok(/spinKey\.kind/.test(SRC) && !/pal\.eye\.kind === "kunai"/.test(SRC),
     'no-spin / title 也读合并后的 kind(否则"苦无不许转"对 minato/tobirama 根本不生效)')
+  // ⚠ 2026-11-22 用户:「每一套选中都会显示未配色·未配色」。
+  // 两个来源:① 标题里 `untuned = !PALETTES[preset]` 恒真(调色已不内置);
+  //          ② 眼睛名取 st.pal.eye.kind,而它恒为 'unknown' → "未配色"。
+  // 现在的规矩:unknown **不进标题**(它是诊断信号,归 boot_log),untuned 标记整段删除。
+  // 只看**代码标识符** `untuned`,不要被那条解释注释里的"untuned = ..."命中(假红过一次)
+  ok(!/\buntuned\s*[=)]/.test(SRC) || !/const untuned/.test(SRC),
+    '标题里没有 untuned 变量了(调色已不再内置,那标记恒真=废话)')
+  ok(/eyeKindT/.test(SRC) && /itemEyeT/.test(SRC),
+    '标题的瞳术名也从清单条目取,不读 pal.eye.kind(否则每套都显示"未配色")')
   ok(!/data:image\/png;base64/.test(SRC), '苦无图没有烘成 base64 进代码(图片不进 git / 不进插件市场)')
   // —— 11-14 用户:球"读起来像贴了个图的圆",要质感 / 3D ——
   ok(SRC.indexOf("-ball::after{") >= 0 && SRC.slice(SRC.indexOf("-ball::after{"), SRC.indexOf("-ball::after{") + 260).indexOf("content:") >= 0,

@@ -1396,10 +1396,30 @@ window.__ModuleLoader__.load({
 				if (st.why === "selection-not-applied") return "点了但没写进去(看 boot.log)";
 				return "这套画面取不到图:" + String(st.why || "unknown");
 			}
-			const untuned = !PALETTES || !PALETTES[st.preset];
-			// 文本框没命中 = 字会直接压在画上,这事必须摆在脸上(上一轮就是这么糊的,而且悄无声息)
+			// 文案组装(2026-11-22 修「每一套都显示 未配色·未配色」)
+			//
+			// 两个"未配色"来自两处不同原因,现在**都不该再出现**:
+			//   ① EYE_KINDS[unknown] = "未配色" —— 只有 pal.eye.kind 是 unknown 时才会取到。
+			//      但球心现在从 preset.json 的 eye 读(见上面那段),每套都有真 kind,不该再是 unknown。
+			//      真取到了 unknown 就是**说明**有问题,所以保留这条显示 —— 它是诊断信号,不是噪音。
+			//   ② untuned = !PALETTES[st.preset] —— 17 套调色已随火影素材移出仓库,
+			//      于是**每一套**都满足这个条件 ⇒ 每套都挂一个"未配色"。
+			//      可这个标记原本的意思是"这套画面还没人工调过色,用的是自动抽色",是给**做主题的人**看的;
+			//      现在调色整体不再内置,它就是恒真的废话,用户每次选主题都被它烦一次。
+			//      ⇒ 删掉。缺调色已经由 palette-missing 记进 boot.log(给开发者看),不该占用户的屏。
 			const noCard = DIAG.cardBoxy === 0 ? " · 文本框未生效!" : "";
-			return (st.title || st.preset || "?") + " · " + (EYE_KINDS[st.pal.eye.kind] || "") + (untuned ? " · 未配色" : "") + noCard;
+			// ⚠ 这里**不能**读 st.pal.eye.kind:pal 来自调色文件,而调色已不再内置,
+			//   它的 eye.kind 恒为 'unknown' ⇒ 每套都会显示"未配色"(用户报的就是这个)。
+			//   真实的 kind 在清单条目里(st.item.eye),与球心那段同一个来源。
+			//   这段代码在 ballTitle 里,拿不到上面那个 eyeSrc 局部变量,所以在这里独立取一次。
+			const itemEyeT = (st.item && st.item.eye) || null;
+			const palEyeT = (st.pal && st.pal.eye) || null;
+			const eyeKindT = (palEyeT && palEyeT.kind && palEyeT.kind !== "unknown")
+				? palEyeT.kind
+				: ((itemEyeT && itemEyeT.kind) || "unknown");
+			// unknown 时整段不显示 —— 它是诊断信号,交给 boot.log,不该每套都挂在标题上。
+			const eyeLabel = (eyeKindT === "unknown") ? "" : (EYE_KINDS[eyeKindT] || eyeKindT);
+			return (st.title || st.preset || "?") + (eyeLabel ? " · " + eyeLabel : "") + noCard;
 		}
 		// 数两件事:**命中几个**、以及**其中几个真生成盒子**。
 		// 只数命中是不够的 —— [data-slot] 锚点带 display:contents,命中了也画不出底(2026-11-14 真机定案)。
