@@ -70,29 +70,41 @@ function render(st) {
 	// URL 从哪来:/arts/<预设>/<文件> 是 boot-naruto 的清单查表路由(ART_MIME 收 .jpg/.jpeg/.png/.webp),
 	// 所以把当前画面 URL 的文件名换掉就行 —— **图只住图库,一行都不烘进代码**(规矩见 dsh-gallery-pack\SHARE.md)。
 	// 只装代码包的人没有图库 -> onerror 回退手绘 SVG:不报错、不空球。所以手绘那套**不许删**。
+	// ⚠ 2026-11-21 第二次修:球心图的来源从 `pal.eye.photo` 改成 **preset 自己的清单条目**。
+	// 为什么必须改:pal 来自 palettes/<id>.json(调色文件),而 17 套调色已随火影素材移出仓库,
+	// 新导入的主题根本没有调色文件 ⇒ paletteFor() 返回 normalizePalette(null)
+	// ⇒ eye.photo 永远是 undefined ⇒ 球心退回手绘占位眼。
+	// 正确来源是 preset.json 里的 `eye` 字段:它随主题一起被导入,不依赖调色。
+	// 两种来源都保留(调色里的 eye 优先,它是"人工微调过"的强证据),清单里的兜底。
+	//
+	// 声明提到 if 块外面:下面 no-spin / title 也要用它。
+	// (第一版写在 if (el.ballImg) 里面,外面那段只能靠 typeof 兜着 —— 那就等于没生效。)
+	const itemEye = (st.item && st.item.eye) || null;
+	const eyeSrc = Object.assign({}, (itemEye || {}), (pal.eye || {}));
+	// pal.eye 总是被 normalizePalette 补成 {kind:'unknown'},会盖掉清单里的真值 ⇒
+	// 只接受 pal 里"比 unknown 更具体"的 kind,其余一律用清单的。
+	if (!pal.eye || pal.eye.kind === "unknown") eyeSrc.kind = (itemEye && itemEye.kind) || "unknown";
+	if (pal.eye && pal.eye.photo) eyeSrc.photo = pal.eye.photo;
 	if (el.ballImg) {
-		// ⚠ 2026-11-21 第二次修:球心图的来源从 `pal.eye.photo` 改成 **preset 自己的清单条目**。
-		// 为什么必须改:pal 来自 palettes/<id>.json(调色文件),而 17 套调色已随火影素材移出仓库,
-		// 新导入的主题(**鲸鱼娘就是**)根本没有调色文件 ⇒ paletteFor() 返回 normalizePalette(null)
-		// ⇒ eye.photo 永远是 undefined ⇒ 球心退回手绘占位眼。用户报的「悬浮球图案都没了」就是这个。
-		// 正确来源是 preset.json 里的 `eye` 字段:它随主题一起被导入,不依赖调色。
-		// 两种来源都保留(调色里的 eye 优先,它是"人工微调过"的强证据),清单里的兜底。
-		const itemEye = (st.item && st.item.eye) || null;
-		const eyeSrc = Object.assign({}, (itemEye || {}), (pal.eye || {}));
-		// pal.eye 总是被 normalizePalette 补成 {kind:'unknown'},会盖掉清单里的真值 ⇒
-		// 只接受 pal 里"比 unknown 更具体"的 kind,其余一律用清单的。
-		if (!pal.eye || pal.eye.kind === "unknown") eyeSrc.kind = (itemEye && itemEye.kind) || "unknown";
-		if (pal.eye && pal.eye.photo) eyeSrc.photo = pal.eye.photo;
 		const want = String(eyeSrc.photo || (eyeSrc.kind === "kunai" ? "kunai.png" : "")).trim();
 		const photo = (want && st.art && st.art.url) ? String(st.art.url).replace(/[^/]*$/, want) : null;
+		// 手绘回退必须用**合并后的 eyeSrc**,不能直接喂 pal。
+		//
+		// ⚠ 2026-11-21 第三次修(用户:最终章舍人/宇智波斑/小南/雏田×2/花火 悬浮球还没有图案)。
+		// 这六套本来就没有照片(轮回眼/白眼/纸蝶只能手绘),走的是 else 分支;
+		// 而那一行原本写 `eyeUri(pal)`,pal.eye.kind 被 normalizePalette 补成了 **'unknown'**
+		// ⇒ 画出来是"未配色占位眼"或一片空 —— 正是用户看到的"没有图案"。
+		// 把合并好的 eyeSrc 塞回 pal 再画,手绘才会用 preset.json 里真正的 kind。
+		const palForEye = Object.assign({}, pal, { eye: eyeSrc });
 		if (photo) {
-			el.ballImg.onerror = function () { el.ballImg.onerror = null; el.ballImg.src = eyeUri(pal); DIAG.ballPhoto = "fallback"; };
+			el.ballImg.onerror = function () { el.ballImg.onerror = null; el.ballImg.src = eyeUri(palForEye); DIAG.ballPhoto = "fallback"; };
 			el.ballImg.src = photo;
 			DIAG.ballPhoto = "photo";
 		} else {
 			el.ballImg.onerror = null;
-			el.ballImg.src = eyeUri(pal);
+			el.ballImg.src = eyeUri(palForEye);
 			DIAG.ballPhoto = "drawn";
+			DIAG.ballEyeKind = String(eyeSrc.kind || "unknown");
 		}
 	}
 	// 眼睛转 = 瞳术在转;**器物转 = 在甩飞刀**。苦无/纸蝶停转(球还是能拖、能点开面板)。
@@ -101,8 +113,14 @@ function render(st) {
 	// 团藏(sharingan,杏仁眼自带倾角)与兄弟之战(mangekyou6,佐助那枚图案不对称)。
 	// 卡卡西/神驹斑没被投诉,是因为它们的图案旋转对称、转了看不出来 —— 那是巧合不是设计,
 	// 所以这里按"是不是照片"划界,而不是按种类赌哪张照片经得起转。
-	if (el.ball) el.ball.classList.toggle("no-spin", pal.eye.kind === "kunai" || pal.eye.kind === "paper" || !!pal.eye.photo);
-	if (el.ball) el.ball.title = (st.title || "未取到画面") + " · " + (EYE_KINDS[pal.eye.kind] || pal.eye.kind);
+	//
+	// ⚠ 这里也必须用合并后的 eyeSrc:原来读 pal.eye.kind 永远是 unknown,
+	// 于是"苦无不许转"那条对 minato/tobirama 根本不生效(它们转起来了),照片那条也看不出来。
+	if (el.ball) {
+		const spinKey = eyeSrc;
+		el.ball.classList.toggle("no-spin", spinKey.kind === "kunai" || spinKey.kind === "paper" || !!spinKey.photo);
+		el.ball.title = (st.title || "未取到画面") + " · " + (EYE_KINDS[spinKey.kind] || spinKey.kind);
+	}
 	alignFallback();
 	paintPanel();
 	probeCards();

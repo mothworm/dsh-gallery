@@ -30,7 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 ---
-以下说明**不是上面那份许可证文本的一部分**，只是把三条容易被忽略的边界写在授权旁边。
+以下说明**不是上面那份许可证文本的一部分**，只是把几条容易被忽略的边界写在授权旁边。
 The notes below do not modify the license text above; they only state what it does
 not cover.
 
@@ -42,3 +42,35 @@ not cover.
    商标或美术著作权。导入到本机的主题素材，版权归各自作者；要商用请先自己去拿到权利方的许可。
 
 3. 本插件与 DeepSeek Harness、与任何第三方作品或角色**都没有赞助或背书关系**。
+
+## 第三方成分说明（Third-party components）
+
+这一节如实交代"哪些东西不是我们原创的"，好让再分发的人知道边界在哪。
+
+**A. 代码：无第三方源码。**
+两个插件的 `package.json` 里 `dependencies` 与 `peerDependencies` 均为空，
+运行期的 `@deepseek-ai/*` 由宿主自己提供（插件从磁盘不解析它们）。
+仓库中没有任何从他人仓库复制/改写的源文件，因此**没有需要随附的第三方著作权声明**。
+复查：
+
+    git grep -n -I -E 'copy from|based on|ported from|adapted from' -- .
+    git grep -n -I -E 'github\.com|npmjs\.com' -- .
+
+**B. 随插件分发的风景图：本项目自产。**
+`dsh-gallery-pack/arts-scenery/` 里的 12 张风景图由本项目用本地部署的 ComfyUI 生成
+（生成脚本见 `dsh-gallery-pack/tools/pack-scenery.py`，模型为本机已下载的 SDXL checkpoint）。
+**不含任何他人角色或美术作品**，故不受第三方许可约束。若你据此再分发，
+按上面 BSD-3-Clause 的条款处理即可。
+
+**C. 火影主题素材：不在本仓库，随私有素材包分发。**
+角色形象与画面版权归各自权利人，本仓库不包含、也不再分发它们。
+拿到素材包的人请遵守素材包自带的约定（禁止商用）。
+
+**D. 曾经的鲸鱼娘素材：已整套移除。**
+它的插画是 CC BY-NC-SA 4.0（署名 / 非商用 / 相同方式共享），与本仓库 BSD-3-Clause
+允许再分发的条款不兼容，因此该主题及其打包脚本已于 2026-11-21 全部删除，
+本仓库与插件包中均不含其任何字节。上面 A/B 两节的结论因此成立。
+
+**E. 关于 ComfyUI 这个名字：**
+它只出现在脚本注释里，用来说明图片是"怎么生成的"。
+ComfyUI 本身是第三方软件，**不随本仓库分发**，也不构成对其的任何背书关系。

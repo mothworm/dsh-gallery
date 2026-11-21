@@ -588,6 +588,19 @@ console.log('\n[5b] 面板文字必须**算**出来,不是靠 opacity 蒙')
     '球心图也从 preset.json 的 eye 字段读(不依赖调色文件)—— 否则导入的主题画不出球心')
   ok(/item: item \|\| null/.test(SRC),
     'stateFromManifest 把清单条目带出来(st.item),球心那段才有 preset.json 的 eye 可读')
+  // ⚠ 2026-11-21 第三次修:手绘那条路也必须喂**合并后的 eyeSrc**。
+  // 真机事故:最终章舍人/宇智波斑/小南/雏田×2/花火 六套本来就没照片(白眼/轮回眼/纸蝶只能手绘),
+  // 走 else 分支,而那里原本写 `eyeUri(pal)` —— pal.eye.kind 被 normalizePalette 补成 'unknown'
+  // ⇒ 画的是 default 分支的灰芒占位眼 ⇒ 用户看到"悬浮球还没有图案"。
+  ok(/const palForEye = Object\.assign\(\{\}, pal, \{ eye: eyeSrc \}\)/.test(SRC) &&
+     /eyeUri\(palForEye\)/.test(SRC),
+    '手绘回退用**合并后的 eyeSrc**(eyeUri(palForEye)),不是 eyeUri(pal) —— 否则无照片的主题只能画占位眼')
+  // 只看**调用形态** `eyeUri(pal)`,不要把注释里引用的历史写法算进来
+  // (第一版写成 /eyeUri\(pal\)/ 就直接命中了修复说明里的那句"原本写 eyeUri(pal)",假红一次)
+  ok(!/eyeUri\(pal\)\s*[;,)]/.test(SRC) && !/\.src = eyeUri\(pal\)/.test(SRC),
+    '产物里没有裸的 eyeUri(pal) 调用(那条等于把 unknown 塞进手绘)')
+  ok(/spinKey\.kind/.test(SRC) && !/pal\.eye\.kind === "kunai"/.test(SRC),
+    'no-spin / title 也读合并后的 kind(否则"苦无不许转"对 minato/tobirama 根本不生效)')
   ok(!/data:image\/png;base64/.test(SRC), '苦无图没有烘成 base64 进代码(图片不进 git / 不进插件市场)')
   // —— 11-14 用户:球"读起来像贴了个图的圆",要质感 / 3D ——
   ok(SRC.indexOf("-ball::after{") >= 0 && SRC.slice(SRC.indexOf("-ball::after{"), SRC.indexOf("-ball::after{") + 260).indexOf("content:") >= 0,
