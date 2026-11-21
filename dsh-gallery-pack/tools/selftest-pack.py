@@ -156,5 +156,40 @@ for needle, why in [("arts2", "必须写明 arts2→arts 这层改名"),
     ok(needle in tip, "提示词里有「%s」—— %s" % (needle, why))
 ok("%USERPROFILE%" in tip or "$env:USERPROFILE%" in tip, "提示词用 %USERPROFILE% 而不是把我这台机的用户名写死")
 
+# —— 第三方素材的许可合规(2026-11-21 加)——
+# 鲸鱼娘那套图的**插画不是 MIT**,是 CC BY-NC-SA 4.0(署名 / 非商用 / 相同方式共享)。
+# 后果有两条必须被机器盯着,否则哪天有人"顺手"把图拷进代码仓库也没人拦:
+#   ① 素材目录里必须真的附上署名链(CREDITS.md),不能只有图;
+#   ② 代码仓库里**不许**出现这些图(仓库是 BSD-3,再分发 CC-BY-NC-SA 的图会冲突)。
+# 用户 2026-11-21 拍板:只导入本机资源包,不进代码仓库。
+# ⚠ 这里只查"有没有署名 + 有没有越界",不猜第三方许可的边界 —— 那是法律问题,不是脚本能判的。
+_WL = os.path.join(PACK, "arts-whalegirl", "whalegirl")
+if os.path.isdir(_WL):
+    _cr = os.path.join(_WL, "CREDITS.md")
+    ok(os.path.isfile(_cr), "鲸鱼娘包里有 CREDITS.md(署名链随包走,不能只有图)")
+    if os.path.isfile(_cr):
+        _t = open(_cr, encoding="utf-8").read()
+        for _needle, _why in [("CC BY-NC-SA 4.0", "许可要写明具体版本"),
+                              ("上善无形", "原创角色「溟月」的作者"),
+                              ("ZipZipPipe", "DeepSeek 女仆装视觉的作者"),
+                              ("非商用", "非商用这条限制要可检索到")]:
+            ok(_needle in _t, "CREDITS.md 里有「%s」—— %s" % (_needle, _why))
+        ok(any(k in _t for k in ("powerdog996", "DreamSkin")), "CREDITS.md 保留了 DreamSkin 那一跳(署名链不能断章)")
+else:
+    ok(True, "没有装鲸鱼娘包(可选包,不装也正常)")
+
+# 代码仓库边界:被 git 跟踪的文件里不许出现鲸鱼娘素材。
+# 判据用 git ls-files 而不是 os.walk —— 后者会把 .gitignore 挡掉的东西也算进来。
+try:
+    import subprocess
+    _repo = os.path.dirname(os.path.dirname(PACK))
+    _tracked = subprocess.run(["git", "ls-files"], cwd=_repo,
+                              capture_output=True, text=True, timeout=30).stdout
+    _leak = [ln for ln in _tracked.splitlines()
+             if ("arts-whalegirl" in ln or "arts-scenery" in ln) and not ln.endswith((".py", ".md"))]
+    ok(not _leak, "代码仓库里没有混进资源包素材(漏进 %d 个: %s)" % (len(_leak), _leak[:3]))
+except Exception as _e:
+    ok(True, "跳过 git 边界检查(%s) —— 不在 git 仓库里跑时是正常的" % type(_e).__name__)
+
 print("\n断言 %d,FAIL %d%s" % (ok_n, len(fails), "，全绿" if not fails else ""))
 sys.exit(0 if not fails else 1)
