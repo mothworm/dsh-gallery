@@ -59,6 +59,9 @@ function stateFromManifest(api, m) {
 		list, selected, manual: !!(m && m.manual), ui,
 		preset: item ? item.id : null,
 		title: item ? (item.title || item.id) : null,
+		// item 原样带出来:球心图要读 preset.json 的 `eye` 字段(见 70-dom 球心那段),
+		// 而那个字段只存在于清单条目里,不在调色文件里。没有它,导入的主题画不出球心图。
+		item: item || null,
 		art: item ? artOf(api, item) : null,
 		why: !list.length ? "empty-manifest" : (item && item.ok ? null : "preset-not-usable"),
 	};
@@ -70,14 +73,21 @@ function stateFromManifest(api, m) {
 //   3) 都没有 -> null,render() 画"看得见的灰底"
 function artOf(api, item) {
 	const files = Array.isArray(item.files) ? item.files : [];
+	// 本套可用的**幕图**清单(NN.jpg)。壁纸轮播/「下一张」要遍历它,所以必须跟着 art 一起出去。
+	// ⚠ 2026-11-21 修:早先这里不返回 files,而 nextArt() 读的是 st.art.files ⇒ 永远是空的
+	// ⇒ 函数在 `if (files.length < 2) return;` 那一行就退出了,「下一张」点了没反应。用户报的就是这个。
+	const shots = files
+		.filter((f) => f && f.url && /^0\d\.(jpe?g|png|webp)$/i.test(String(f.name || "")))
+		.map((f) => ({ name: f.name, url: cleanUrl(f.url) }))
+		.sort((a, b) => String(a.name).localeCompare(String(b.name)));
 	const pal = PALETTES && PALETTES[item.id];
 	const want = pal && pal.hero && pal.hero.file ? String(pal.hero.file).toLowerCase() : null;
 	const hit = want ? files.find((f) => f && String(f.name).toLowerCase() === want) : null;
-	if (hit && hit.url) return { url: cleanUrl(hit.url), pos: (pal.hero.pos || "center"), src: "hero", file: want };
+	if (hit && hit.url) return { url: cleanUrl(hit.url), pos: (pal.hero.pos || "center"), src: "hero", file: want, files: shots };
 	const uri = safeCall(() => api.thumbUrl(item));
-	if (uri) return { url: cleanUrl(uri), pos: "center", src: "thumbUrl", file: null };
-	const any = files.find((f) => f && /\.(jpe?g|png|webp)$/i.test(String(f.name || "")) && f.url);
-	if (any) return { url: cleanUrl(any.url), pos: "center", src: "first-file", file: any.name };
+	if (uri) return { url: cleanUrl(uri), pos: "center", src: "thumbUrl", file: null, files: shots };
+	const any = shots.length ? shots[0] : null;
+	if (any) return { url: any.url, pos: "center", src: "first-file", file: any.name, files: shots };
 	return null;
 }
 // URL 是从清单里拿的,不该有引号/括号;真出现也不能让它把 CSS 截断

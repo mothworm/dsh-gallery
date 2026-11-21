@@ -12,7 +12,7 @@ let tkTheme = null;   // ctx.inject(["theme"]) 给的句柄
 let panelOpen = false;
 // 构建戳:探针日志和「点配饰按钮」那条日志**共用这一个常量**。写成两处字面量的话,
 // 总有一天只改了一处 —— 那时日志一半说 b1931、一半说 b2011,而两边都"看起来像新代码在跑"。
-const BUILD_STAMP = "b2112";
+const BUILD_STAMP = "b2113";
 let PENDING;          // 刚点过、等清单回读出同一个 id 才算真生效
 let chipHold = 0, chipTimer = null;
 
@@ -71,8 +71,19 @@ function render(st) {
 	// 所以把当前画面 URL 的文件名换掉就行 —— **图只住图库,一行都不烘进代码**(规矩见 dsh-gallery-pack\SHARE.md)。
 	// 只装代码包的人没有图库 -> onerror 回退手绘 SVG:不报错、不空球。所以手绘那套**不许删**。
 	if (el.ballImg) {
-		// 球心图的文件名从 `eye.photo` 来(神驹斑的永恒万花筒就是靠它换的),没写就沿用苦无那套约定。
-		const want = String(pal.eye.photo || (pal.eye.kind === "kunai" ? "kunai.png" : "")).trim();
+		// ⚠ 2026-11-21 第二次修:球心图的来源从 `pal.eye.photo` 改成 **preset 自己的清单条目**。
+		// 为什么必须改:pal 来自 palettes/<id>.json(调色文件),而 17 套调色已随火影素材移出仓库,
+		// 新导入的主题(**鲸鱼娘就是**)根本没有调色文件 ⇒ paletteFor() 返回 normalizePalette(null)
+		// ⇒ eye.photo 永远是 undefined ⇒ 球心退回手绘占位眼。用户报的「悬浮球图案都没了」就是这个。
+		// 正确来源是 preset.json 里的 `eye` 字段:它随主题一起被导入,不依赖调色。
+		// 两种来源都保留(调色里的 eye 优先,它是"人工微调过"的强证据),清单里的兜底。
+		const itemEye = (st.item && st.item.eye) || null;
+		const eyeSrc = Object.assign({}, (itemEye || {}), (pal.eye || {}));
+		// pal.eye 总是被 normalizePalette 补成 {kind:'unknown'},会盖掉清单里的真值 ⇒
+		// 只接受 pal 里"比 unknown 更具体"的 kind,其余一律用清单的。
+		if (!pal.eye || pal.eye.kind === "unknown") eyeSrc.kind = (itemEye && itemEye.kind) || "unknown";
+		if (pal.eye && pal.eye.photo) eyeSrc.photo = pal.eye.photo;
+		const want = String(eyeSrc.photo || (eyeSrc.kind === "kunai" ? "kunai.png" : "")).trim();
 		const photo = (want && st.art && st.art.url) ? String(st.art.url).replace(/[^/]*$/, want) : null;
 		if (photo) {
 			el.ballImg.onerror = function () { el.ballImg.onerror = null; el.ballImg.src = eyeUri(pal); DIAG.ballPhoto = "fallback"; };
@@ -218,24 +229,47 @@ function nextArt() {
 	const st = STATE.st;
 	const api = bootApi();
 	if (!api || !st || !st.art) return;
-	// 这套 preset 的所有 NN.jpg 按名字排序,取当前的下一个
+	// 这套 preset 的所有 NN.jpg 按名字排序,取当前的下一个。
+	// 当前是哪张:先看"上一次手动切过去的那张"(STATE.wallNow),再看 art.file,最后从 url 里抠。
+	// 只看 art.file 是不够的 —— 走 thumbUrl 那条路时 art.file 恒为 null,永远从第一张重来。
 	const files = (st.art && Array.isArray(st.art.files) ? st.art.files : [])
-		.filter((f) => f && /^0\d\.(jpe?g|png|webp)$/i.test(String(f.name || "")));
-	if (files.length < 2) return;
+		.filter((f) => f && f.url && /^0\d\.(jpe?g|png|webp)$/i.test(String(f.name || "")));
+	if (files.length < 2) {
+		// 只有一张(或缺 files)时给出可诊断信号,而不是默默什么都不做
+		diagWarn("wall-next-nofiles", "这套只有 " + files.length + " 张幕图,无法换下一张");
+		return;
+	}
 	files.sort((a, b) => String(a.name).localeCompare(String(b.name)));
-	const cur = String((st.art && st.art.file) || "");
+	const fromUrl = /([^/]+?)\?/.exec(String(st.art.url || ""));
+	const cur = String(st.wallNow || st.art.file || (fromUrl ? fromUrl[1] : "") || "");
 	const i = files.findIndex((f) => f.name === cur);
 	const nx = files[(i + 1 + files.length) % files.length];
 	if (!nx) return;
+	STATE.wallNow = nx.name;
 	applyWallArt(nx);
 }
-// 换壁纸:直接改背景层那两个节点的 background-image。宿主切主题时会重写它们,
-// 所以这里只在"同一套之内"用 —— 不试图去抢宿主的渲染权。
+// 换壁纸:**改 STATE.st.art 再重新 render**,而不是去改 DOM 节点的 background-image。
+//
+// ⚠ 2026-11-21 第二次修。第一版写的是:
+//     const bg = document.getElementById(NS + "-bg"); bg.style.backgroundImage = ...
+//   两个错:
+//   ① **改错了对象**。正常路径下 `#-bg` 是 `display:none` 的兜底浮层(见 60-boot 的 dynCss:
+//      `#<NS>-bg,#<NS>-scrim{display:none}`),真正的画面是画在**会话区容器**(ART_TARGET)上的;
+//      给一个隐藏节点设 background-image,视觉上等于什么都没做。
+//   ② **抢不过渲染**。就算改对了节点,下一次 render() 会用 dynCss 重新生成整段 CSS 把它盖掉。
+//   正确做法是把新的图塞进 st.art.url/pos,让 render() 自己重算 —— 这样亮暗罩、冲淡、veil
+//   那些层都跟着一起换,不会出现"图换了但纱还是旧的"。
 function applyWallArt(f) {
 	if (!f || !f.url) return;
-	const bg = document.getElementById(NS + "-bg");
-	if (bg) bg.style.backgroundImage = 'url("' + cleanUrl(f.url) + '")';
-	STATE.lastWall = String(f.name || "");
+	const cur = STATE.st;
+	const art = Object.assign({}, cur.art, {
+		url: cleanUrl(f.url),
+		pos: "center",
+		file: String(f.name || ""),
+		src: "wall",
+	});
+	STATE.wallNow = String(f.name || "");
+	render(STATE.with({ art: art }));
 }
 // ---- 面板 ----
 function paintPanel() {
@@ -291,6 +325,8 @@ function choose(id, opts) {
 	const replay = !!(opts && opts.replay);
 	const api = bootApi();
 	if (!api || typeof api.usePreset !== "function") { diagWarn("usePreset-missing"); showChip(3); return; }
+	// 换套要把"当前壁纸"的记忆清掉:上一套的 03.jpg 名字不该带进新一套。
+	STATE.wallNow = "";
 	const r = safeCall(() => api.usePreset(id, replay));
 	if (!r || typeof r.then !== "function") { diagWarn("usePreset-no-promise"); return; }
 	r.then((res) => {

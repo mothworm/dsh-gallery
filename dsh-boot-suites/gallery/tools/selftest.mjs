@@ -580,6 +580,14 @@ console.log('\n[5b] 面板文字必须**算**出来,不是靠 opacity 蒙')
   ok(/DIAG\.ballPhoto = "fallback"/.test(SRC) && /onerror/.test(SRC),
     '图库不在时 onerror 回退手绘 SVG,并用 DIAG.ballPhoto 记账(真机核对 photo / drawn / fallback)')
   ok(/eyeUri\(pal\)/.test(SRC), '手绘 SVG 那条路**还留着** —— 只装代码包的人靠它,不许删')
+  // ⚠ 2026-11-21 补:球心图**不能只从调色文件读**。
+  // 真机事故:17 套调色随火影素材移出仓库后,新导入的主题(鲸鱼娘、风景)没有调色文件 ⇒
+  // paletteFor() 返回 normalizePalette(null) ⇒ pal.eye.photo 恒 undefined ⇒ 球心退回手绘占位眼。
+  // 用户看到的就是「悬浮球图案都没了」。所以球心必须能从 **preset.json 的 eye 字段**读到。
+  ok(/st\.item && st\.item\.eye/.test(SRC) || /itemEye/.test(SRC),
+    '球心图也从 preset.json 的 eye 字段读(不依赖调色文件)—— 否则导入的主题画不出球心')
+  ok(/item: item \|\| null/.test(SRC),
+    'stateFromManifest 把清单条目带出来(st.item),球心那段才有 preset.json 的 eye 可读')
   ok(!/data:image\/png;base64/.test(SRC), '苦无图没有烘成 base64 进代码(图片不进 git / 不进插件市场)')
   // —— 11-14 用户:球"读起来像贴了个图的圆",要质感 / 3D ——
   ok(SRC.indexOf("-ball::after{") >= 0 && SRC.slice(SRC.indexOf("-ball::after{"), SRC.indexOf("-ball::after{") + 260).indexOf("content:") >= 0,
@@ -781,13 +789,23 @@ loaded.exports.apply({ inject: (deps, cb) => { ok(Array.isArray(deps) && deps[0]
     ok(T.wallOn() === true && win.localStorage.getItem('dsh-bs-wall') === '1', '壁纸轮播是**独立**开关(可以只换图不换主题)')
     T.el.wallBtn.dispatch('click')
     ok(T.wallOn() === false, '壁纸轮播也能关')
-    // 手动换壁纸:背景层的 background-image 必须真的变了
-    const bg = T.el.bg
-    if (bg) {
-      const before = bg.style.backgroundImage
+    // 手动换壁纸。
+    // ⚠ 2026-11-21 第二次修这段。原来断言的是"背景层 #-bg 的 background-image 变了" ——
+    //   那条断言**通过了,而功能是坏的**:正常路径下 #-bg 是 display:none 的兜底浮层,
+    //   真正的画面画在会话区容器上(60-boot 的 dynCss:`#<NS>-bg,#<NS>-scrim{display:none}`),
+    //   所以"改了个隐藏节点的样式"既能过断言、用户又什么都看不到。
+    //   新断言盯**语义**:nextArt() 之后 STATE.st.art.url 必须换成本套另一张幕图。
+    {
+      const before = String((T.STATE.st.art && T.STATE.st.art.url) || '')
+      const real = T.STATE.st.art
+      ok(!!real && Array.isArray(real.files) && real.files.length >= 2,
+        'artOf 把本套的幕图清单带出来了(没有 files,「下一张」会在第一行就 return)。实际 ' + (real && real.files ? real.files.length : 0) + ' 张')
       T.nextArt()
-      ok(bg.style.backgroundImage !== before || !before,
-        '「下一张」真的换掉了背景层那一张(手动选壁纸这条路是通的)')
+      const after = String((T.STATE.st.art && T.STATE.st.art.url) || '')
+      ok(after && after !== before,
+        '「下一张」真的换到了**本套的另一张幕图**(改的是 STATE.st.art,不是去改隐藏节点)。' + before + ' -> ' + after)
+      ok(/\/0[1-9]\.(jpe?g|png|webp)\?/.test(after) || /\/0[1-9]\.(jpe?g|png|webp)$/.test(after),
+        '换过去之后 url 指向的是幕图(NN.jpg),不是 icon.png 之类的附属图。实际 ' + after)
     }
   }
   // ---- 真宿主快照集成 ----
