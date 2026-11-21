@@ -197,6 +197,31 @@ ok(konan && typeof konan.mtime === 'number' && konan.mtime > 0, '清单 mtime �
 ok(konan && konan.url === '/dsh-boot-gallery/arts/konan/preset.json?v=' + konan.version, '清单 url 自带 ?v=<preset.json 自己的 version>')
 ok(konan && konan.files.length === 2 && konan.files.every((f) => /^s[0-9a-f]+t[0-9a-f]+$/.test(f.version)), '清单 files[] 每个都带自己的 version')
 ok(pj.selected === 'konan' && pj.usable === 1, '无选择时 selected 回落清单第一个可播的')
+// —— eye 透传(2026-11-21 修「悬浮球图案都没了」)——
+// 球心图的文件名来自清单条目的 eye.photo;不透传的话,客户端只能退回手绘占位眼。
+// 这条守两件事:① eye 真的被带出来了;② photo 被白名单掐过(不许带 ../ 或子目录)。
+{
+  const fx = JSON.parse(fs.readFileSync(path.join(ARTS, 'konan', 'preset.json'), 'utf8'))
+  if (fx.eye) {
+    ok(!!konan.eye && !!konan.eye.photo, '清单透传 preset.json 的 eye(球心图靠它,不透传就退回占位眼);实际 ' + JSON.stringify(konan && konan.eye))
+  } else {
+    ok(true, '这套 preset.json 没写 eye,跳过透传断言')
+  }
+  // 直接验净化规则:写一个带 ../ 的 eye,不许被透传出去
+  const bad = path.join(ARTS, 'eyeprobe')
+  fs.mkdirSync(bad, { recursive: true })
+  fs.writeFileSync(path.join(bad, '01.jpg'), fs.readFileSync(path.join(ARTS, 'konan', '01.jpg')))
+  fs.writeFileSync(path.join(bad, 'preset.json'), JSON.stringify({
+    schema: 1, id: 'eyeprobe', title: 'eye probe', open: 'none',
+    eye: { kind: 'photo', photo: '../../evil.png' },
+    acts: [{ dur: 100, file: '01.jpg' }],
+  }))
+  const pj2 = JSON.parse((await hit('/dsh-boot-gallery/presets.json')).body())
+  const probe = pj2.presets.find((p) => p.id === 'eyeprobe')
+  ok(!!probe && (!probe.eye || !probe.eye.photo),
+    'eye.photo 含路径的写法被拒(不许 ../ 进 URL);实际 ' + JSON.stringify(probe && probe.eye))
+  fs.rmSync(bad, { recursive: true, force: true })
+}
 
 // 9) /arts 素材:200 + 正确 MIME + 缓存头三条不变量
 let ares = await hit('/dsh-boot-gallery/arts/konan/01.jpg')

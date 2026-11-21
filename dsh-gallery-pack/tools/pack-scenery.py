@@ -30,6 +30,12 @@ import sys
 import zipfile
 
 WS = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# 本机 Python 工具库:优先环境变量 DSH_PYLIBS,否则取「工作区根/_pylibs」。
+# 与 build-frames.py 同一套写法 —— 写死绝对路径会把开发机结构发布出去,换机就 ImportError。
+for _c in (os.environ.get("DSH_PYLIBS"), os.path.join(WS, "_pylibs")):
+    if _c and os.path.isdir(_c) and _c not in sys.path:
+        sys.path.insert(0, _c)
+        break
 SRC = r"G:\make-cg\video-gen-workspace\outputs\comfyui\dsh-landscape"
 OUT = os.path.join(WS, "dsh-gallery-pack", "arts-scenery")
 
@@ -80,8 +86,46 @@ def build_preset(gid, title, sub, items):
         "title": title,
         "sub": sub,
         "open": "none",
+        # 悬浮球球心:用本套第一张图自动裁一个圆形图标出来(见 make_eye()).
+        # 为什么要它 —— 用户 2026-11-21:「悬浮球图案都没了」。根因是球心图以前只从调色文件读,
+        # 而导入的主题没有调色文件;现在 eye 跟着 preset.json 走(宿主 presetEntry 已透传),
+        # 所以每套主题**自己定义**球心,不依赖调色、也不依赖第三方素材。
+        "eye": {"kind": "photo", "photo": "eye.png"},
         "acts": acts,
     }
+
+
+def make_eye(src_img, out_path, size=256):
+    """从风景图裁一个**圆形球心图**。
+
+    为什么不能"直接把大图指过去":球心是 74px 的圆(50-css 有 border-radius:999px),
+    塞一张 832x1216 的整图进去会按 cover 缩放,看着像"糊了一片的哪个角落",不是图徽。
+    这里做三步:
+      ① 取中心正方形(构图最稳,避开天空的纯色块与地面的杂乱);
+      ② **圆外全透明** —— 球有自己的圆形容器,给带直角的方图会露出四个角;
+      ③ 压一圈暗边 + 内高光,和小尺寸下不至于糊成一团色块。
+    """
+    from PIL import Image, ImageDraw, ImageFilter
+    w, h = src_img.size
+    s = min(w, h)
+    box = ((w - s) // 2, (h - s) // 2, (w - s) // 2 + s, (h - s) // 2 + s)
+    im = src_img.crop(box).resize((size, size), Image.LANCZOS).convert("RGBA")
+
+    # ② 圆形遮罩(4x 超采样再缩回来,边缘不毛)
+    SS = 4
+    mask = Image.new("L", (size * SS, size * SS), 0)
+    ImageDraw.Draw(mask).ellipse((0, 0, size * SS - 1, size * SS - 1), fill=255)
+    mask = mask.resize((size, size), Image.LANCZOS)
+    im.putalpha(mask)
+
+    # ③ 暗边:往内收的一圈半透明黑,让圆徽在亮底上也立得住
+    ring = Image.new("RGBA", (size * SS, size * SS), (0, 0, 0, 0))
+    ImageDraw.Draw(ring).ellipse((0, 0, size * SS - 1, size * SS - 1),
+                                 outline=(0, 0, 0, 130), width=max(2, size * SS // 48))
+    ring = ring.resize((size, size), Image.LANCZOS)
+    im = Image.alpha_composite(im, ring)
+    im.save(out_path, "PNG", optimize=True)
+    return os.path.getsize(out_path)
 
 
 def main():
@@ -141,9 +185,19 @@ def main():
         # 只保留真的有文件的 acts
         preset["acts"] = [a for a in preset["acts"]
                           if os.path.isfile(os.path.join(d, a["file"]))]
+        # 球心图:拿本套第一张幕图裁一个圆徽(见 make_eye 的注释)
+        eye_size = 0
+        first = preset["acts"][0]["file"] if preset["acts"] else None
+        if first:
+            from PIL import Image as _Img
+            eye_size = make_eye(_Img.open(os.path.join(d, first)).convert("RGB"),
+                                os.path.join(d, "eye.png"))
+        else:
+            # 一张图都没有就撤掉 eye 字段:别让清单引用一个不存在的文件
+            preset.pop("eye", None)
         with open(os.path.join(d, "preset.json"), "w", encoding="utf-8") as f:
             json.dump(preset, f, ensure_ascii=False, indent=2)
-        print("  %-16s %d 张 -> %s" % (gid, n, d))
+        print("  %-16s %d 张 + eye.png(%d B) -> %s" % (gid, n, eye_size, d))
         total += n
 
     zp = OUT + ".zip"

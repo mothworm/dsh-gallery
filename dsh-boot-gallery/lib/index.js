@@ -236,6 +236,24 @@ function presetEntry(id, dirReal) {
   if (typeof doc.title === 'string' && doc.title.trim()) e.title = doc.title.trim().slice(0, 80)
   // open 的默认值必须和浏览器侧同一条规则:只有写 "none" 才没有开场云
   e.open = doc.open === 'none' ? 'none' : 'akatsuki-cloud'
+  // eye:悬浮球球心图(2026-11-21 修)。**必须原样透传**,不能只留在 preset.json 里。
+  //
+  // 为什么要这一行:客户端画球心的逻辑是"拿当前画面 URL 换掉文件名"(见 70-dom),
+  // 而文件名来自 `eye.photo`。此前 eye 只在**调色文件**(palettes/<id>.json)里读,
+  // 可调色是随主题调参的、不是每套都有 —— 导入的主题没有调色文件,球心就只能退回手绘占位眼。
+  // 把 eye 放进清单条目后,"这套主题要什么球心"这件事跟着主题走,不依赖调色。
+  // 只透传两个白名单字段(kind / photo),别把整个 doc.eye 原样泼出去:
+  // 一是没必要,二是 photo 最终会拼进 URL,必须在这里就掐掉路径分隔符。
+  if (doc.eye && typeof doc.eye === 'object') {
+    const eye = {}
+    if (typeof doc.eye.kind === 'string' && doc.eye.kind.trim()) eye.kind = doc.eye.kind.trim().slice(0, 32)
+    if (typeof doc.eye.photo === 'string') {
+      const p = doc.eye.photo.trim().toLowerCase()
+      // 只接受单段文件名(与 safeArtFile 同口径),绝不放 ../ 或子目录
+      if (p && safeArtFile(p)) eye.photo = p
+    }
+    if (eye.kind || eye.photo) e.eye = eye
+  }
   if (!Array.isArray(doc.acts)) { e.error = 'acts 不是数组'; return e }
 
   // 登记目录里所有白名单位图,供客户端按 act.file 查 ?v=(只有 v 对上才发 immutable)
