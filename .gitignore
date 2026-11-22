@@ -33,6 +33,9 @@
 /dsh-gallery-pack/*
 !/dsh-gallery-pack/tools/
 
+# —— 白名单：仓库根的工具脚本（推送脚本等，不含任何素材）——
+!/tools/
+
 # —— 白名单：根这几份是仓库自己的门面 ——
 !/.gitignore
 !/.gitattributes
