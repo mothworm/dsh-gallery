@@ -6,7 +6,7 @@
 #
 # 11-14 那版为什么写"本目录目前不要提交"：
 #   当时 lib\client.js 是 1,904,832 B，内嵌 9 处 data:image/jpeg;base64（≈1.33 MB
-#   火影手游美术：幕1–幕5 / 纸翼 / 爆炸 / duel）。那些东西不随代码分发，
+#   第三方美术素材：分镜图 / 角色立绘 / 爆炸特效）。那些东西不随代码分发，
 #   所以整目录在剥掉内嵌图之前不进 git。
 # ⇒ 2026-11-20 复核：**这条前提已经不成立了**，本目录可以进版本库 ——
 #   lib\client.js 现在 45,860 B，data:image/(jpeg|png|webp) 命中 **0**（"base64" 只剩注释里的字）；
@@ -14,7 +14,7 @@
 #   （lib\index.js 的 framesDir() = join(homeDir(), "frames")，
 #    lib\client.js 的 const FR = "/" + PKG + "/frames/"），
 #   那九张图由私有素材包投放（v7 包里 frames/ 9 条 / 1,395,945 B），不在代码树里。
-#   复查命令与逐条口径见 ../dsh-boot-suites/naruto/README.md「素材分离」一节。
+#   复查命令与逐条口径见 ../dsh-boot-suites/gallery/README.md「素材分离」一节。
 #
 # 下面这些规则的作用是**防以后有人把参考图、导出稿、截图稿塞进代码树**：
 # 版权物料一旦进了 git 历史，要清干净得改写历史，比一开始不放进去贵得多。

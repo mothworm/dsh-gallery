@@ -205,7 +205,7 @@ ok(/palette-missing/.test(T.DIAG.warns.join('|')) === false, 'normalizePalette(n
 ok(T.tokensFor(null) && Object.keys(T.tokensFor(null)).length === 89, '兜底调色也能铺满 89 个 token')
 
 // ---------------- 3. 画面调色:与角色无关的不变式 ----------------
-  // 2026-11-21:角色专属调色(17 套)已随火影素材移出仓库,**仓库里现在是 0 套**。
+  // 2026-11-21:角色专属调色(17 套)已随主题素材移出仓库,**仓库里现在是 0 套**。
   // 原来这一段是对 tobirama-night / toneri / madara-god 逐套的断言 —— 那些 palette 不在了,
   // 断言跟着失效。但下面这些**与角色无关**的不变式必须保住,它们锁的是真出过的事故:
   console.log('\n[3] 调色与 token 的通用不变式')
@@ -423,7 +423,7 @@ console.log('\n[5b] 面板文字必须**算**出来,不是靠 opacity 蒙')
     '缩略图上的名字自带描边兜底(图是用户自己的画,那里没法靠面板色)')
 }
 // ---------------- 5c. 瞳纹形状引擎(与角色无关) ----------------
-  // 2026-11-21:原来这一段是 13 个角色的"谁配哪只眼"对照表 —— 那些 palette 已随火影素材移出仓库,
+  // 2026-11-21:原来这一段是 13 个角色的"谁配哪只眼"对照表 —— 那些 palette 已随主题素材移出仓库,
   // 表里每个 key 都不存在了。**对照表删除**,但形状引擎本身的三条不变式必须留着:
   // 六芒星的构造、瞳红不许被抽色改成别的色系、眼图必须是可复现的几 KB 文本。
   console.log('\n[5c] 瞳纹形状引擎')
@@ -497,7 +497,7 @@ console.log('\n[5b] 面板文字必须**算**出来,不是靠 opacity 蒙')
   ok(/backdrop-filter:blur\(calc\(var\(--bs-glass-fog/.test(SRC),
     '磨砂是真的 backdrop-filter 模糊(雾感驱动半径),不是一层假半透明渐变')
   // —— 素材零引用:这是本轮最重要的一条 ——
-  // 用户要把火影素材包**单独拆出去、通过壁纸界面导入**;只要代码里还引用 frame-*.png,
+  // 用户要把主题素材包**单独拆出去、通过壁纸界面导入**;只要代码里还引用 frame-*.png,
   // 那个包就不是"纯数据",开源树也不可能干净。所以这里钉死:**一个都不许引用**。
   ok(!/frame-doton|frame-katon|frame-raton|frame-suiton|frame-futon/.test(SRC),
     '代码里**不再引用任何五遁底图**(frame-*.png 一个字节都没有)—— 素材包可以整体搬走/换掉')
@@ -552,7 +552,7 @@ console.log('\n[5b] 面板文字必须**算**出来,不是靠 opacity 蒙')
     const c = (JSON.parse(fsM.readFileSync(dir + f, "utf8")) || {}).card
     if (c && !(c.a >= 0.5 && c.a <= 0.74 && c.b >= 0.5 && c.b <= 0.74 && c.quiet >= 0.4 && c.quiet <= 0.62)) over.push(f.replace(/\.json$/, "") + "(" + c.a + "/" + c.b + "/" + c.quiet + ")")
   }
-  // 2026-11-21:角色专属调色已随火影素材移出仓库 ⇒ 现在是**零套**,所以"至少 12 套"这条前提没了。
+  // 2026-11-21:角色专属调色已随主题素材移出仓库 ⇒ 现在是**零套**,所以"至少 12 套"这条前提没了。
   // 但不能直接删:下面那条"card.a/b 落在 0.5–0.74"是在**防止有人加回调色时把厚度写回 0.9x**,
   // 那是真闸门。这里改成断言"目录可读 + 空目录是合法状态",把"有没有"和"合不合规"两件事分开。
   ok(Array.isArray(files), 'palettes/tuned 目录可读(空目录 = 未内置调色,是合法状态);实测 ' + files.length + ' 套')
@@ -586,7 +586,7 @@ console.log('\n[5b] 面板文字必须**算**出来,不是靠 opacity 蒙')
     '图库不在时 onerror 回退手绘 SVG,并用 DIAG.ballPhoto 记账(真机核对 photo / drawn / fallback)')
   ok(/eyeUri\(pal\)/.test(SRC), '手绘 SVG 那条路**还留着** —— 只装代码包的人靠它,不许删')
   // ⚠ 2026-11-21 补:球心图**不能只从调色文件读**。
-  // 真机事故:17 套调色随火影素材移出仓库后,新导入的主题(鲸鱼娘、风景)没有调色文件 ⇒
+  // 真机事故:17 套调色随主题素材移出仓库后,新导入的主题没有调色文件 ⇒
   // paletteFor() 返回 normalizePalette(null) ⇒ pal.eye.photo 恒 undefined ⇒ 球心退回手绘占位眼。
   // 用户看到的就是「悬浮球图案都没了」。所以球心必须能从 **preset.json 的 eye 字段**读到。
   ok(/st\.item && st\.item\.eye/.test(SRC) || /itemEye/.test(SRC),
@@ -594,7 +594,7 @@ console.log('\n[5b] 面板文字必须**算**出来,不是靠 opacity 蒙')
   ok(/item: item \|\| null/.test(SRC),
     'stateFromManifest 把清单条目带出来(st.item),球心那段才有 preset.json 的 eye 可读')
   // ⚠ 2026-11-21 第三次修:手绘那条路也必须喂**合并后的 eyeSrc**。
-  // 真机事故:最终章舍人/宇智波斑/小南/雏田×2/花火 六套本来就没照片(白眼/轮回眼/纸蝶只能手绘),
+  // 真机事故:有六套本来就没照片(白眼/轮回眼/纸蝶只能手绘),
   // 走 else 分支,而那里原本写 `eyeUri(pal)` —— pal.eye.kind 被 normalizePalette 补成 'unknown'
   // ⇒ 画的是 default 分支的灰芒占位眼 ⇒ 用户看到"悬浮球还没有图案"。
   ok(/const palForEye = Object\.assign\(\{\}, pal, \{ eye: eyeSrc \}\)/.test(SRC) &&

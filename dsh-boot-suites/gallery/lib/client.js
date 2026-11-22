@@ -1333,7 +1333,7 @@ window.__ModuleLoader__.load({
 			// 所以把当前画面 URL 的文件名换掉就行 —— **图只住图库,一行都不烘进代码**(规矩见 dsh-gallery-pack\SHARE.md)。
 			// 只装代码包的人没有图库 -> onerror 回退手绘 SVG:不报错、不空球。所以手绘那套**不许删**。
 			// ⚠ 2026-11-21 第二次修:球心图的来源从 `pal.eye.photo` 改成 **preset 自己的清单条目**。
-			// 为什么必须改:pal 来自 palettes/<id>.json(调色文件),而 17 套调色已随火影素材移出仓库,
+			// 为什么必须改:pal 来自 palettes/<id>.json(调色文件),而 17 套调色已随主题素材移出仓库,
 			// 新导入的主题根本没有调色文件 ⇒ paletteFor() 返回 normalizePalette(null)
 			// ⇒ eye.photo 永远是 undefined ⇒ 球心退回手绘占位眼。
 			// 正确来源是 preset.json 里的 `eye` 字段:它随主题一起被导入,不依赖调色。
@@ -1352,8 +1352,8 @@ window.__ModuleLoader__.load({
 				const photo = (want && st.art && st.art.url) ? String(st.art.url).replace(/[^/]*$/, want) : null;
 				// 手绘回退必须用**合并后的 eyeSrc**,不能直接喂 pal。
 				//
-				// ⚠ 2026-11-21 第三次修(用户:最终章舍人/宇智波斑/小南/雏田×2/花火 悬浮球还没有图案)。
-				// 这六套本来就没有照片(轮回眼/白眼/纸蝶只能手绘),走的是 else 分支;
+				// ⚠ 2026-11-21 第三次修(用户:多套主题的悬浮球还没有图案)。
+				// 这几套本来就没有照片(轮回眼/白眼/纸蝶只能手绘),走的是 else 分支;
 				// 而那一行原本写 `eyeUri(pal)`,pal.eye.kind 被 normalizePalette 补成了 **'unknown'**
 				// ⇒ 画出来是"未配色占位眼"或一片空 —— 正是用户看到的"没有图案"。
 				// 把合并好的 eyeSrc 塞回 pal 再画,手绘才会用 preset.json 里真正的 kind。
@@ -1402,7 +1402,7 @@ window.__ModuleLoader__.load({
 			//   ① EYE_KINDS[unknown] = "未配色" —— 只有 pal.eye.kind 是 unknown 时才会取到。
 			//      但球心现在从 preset.json 的 eye 读(见上面那段),每套都有真 kind,不该再是 unknown。
 			//      真取到了 unknown 就是**说明**有问题,所以保留这条显示 —— 它是诊断信号,不是噪音。
-			//   ② untuned = !PALETTES[st.preset] —— 17 套调色已随火影素材移出仓库,
+			//   ② untuned = !PALETTES[st.preset] —— 17 套调色已随主题素材移出仓库,
 			//      于是**每一套**都满足这个条件 ⇒ 每套都挂一个"未配色"。
 			//      可这个标记原本的意思是"这套画面还没人工调过色,用的是自动抽色",是给**做主题的人**看的;
 			//      现在调色整体不再内置,它就是恒真的废话,用户每次选主题都被它烦一次。

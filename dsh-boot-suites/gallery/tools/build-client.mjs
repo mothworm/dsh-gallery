@@ -50,7 +50,7 @@ const tunedDir = join(SUITE, 'palettes', 'tuned')
 const ids = new Set()
 if (existsSync(autoDir)) for (const f of readdirSync(autoDir)) if (f.endsWith('.auto.json')) ids.add(f.replace(/\.auto\.json$/, ''))
 if (existsSync(tunedDir)) for (const f of readdirSync(tunedDir)) if (f.endsWith('.json')) ids.add(f.replace(/\.json$/, ''))
-// 2026-11-21:调色不再必填。角色专属的 17 套随火影素材一起移出仓库,
+// 2026-11-21:调色不再必填。角色专属的 17 套随主题素材一起移出仓库,
 // 现在"主题"是从资源包导入的,导入时未必带 palette —— 缺了就走 normalizePalette(null) 的默认配色
 // (20-color.part.js 的 paletteFor 里已经处理:有就吃、没有就报 palette-missing 并兜底)。
 // ⇒ 这里**不再 die**,只是打一行提示,让"零调色"也能出包。
