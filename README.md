@@ -52,6 +52,17 @@
 
 ## 发货闸门（顺序是死的）
 
+## 装之前要有
+
+| 前提 | 说明 |
+|---|---|
+| **DSH 桌面版** | 先**启动过一次**，这样 `~/.dsh/profiles/desktop/` 才会存在（脚本不替你创建 profile） |
+| **Node.js ≥ 20** | 两个 `install.mjs` 都是 Node 脚本。`node -v` 报 `command not found` 就先装：macOS `brew install node`、Windows 用官方 installer 或 `winget install OpenJS.NodeJS.LTS` |
+| 终端 | Windows 用 PowerShell / Git Bash 都行；路径里的 `~` 在 PowerShell 里写成 `$HOME` |
+
+> 2026-11-22 在 macOS（Apple Silicon）上实测：这台机器一开始**就没装 node**，
+> 第一条命令直接 `zsh: command not found: node`。所以把它写进前提，别让下一个人也卡在这。
+
 ## 装（两条命令）
 
 ```bash
