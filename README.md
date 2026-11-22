@@ -52,21 +52,32 @@
 
 ## 发货闸门（顺序是死的）
 
-## 装（两步，各一条命令）
+## 装（两条命令）
 
 ```bash
 git clone https://github.com/mothworm/dsh-gallery.git
 cd dsh-gallery
 
-# 1. 宿主侧：开屏动画（装完要**重启** DSH 才生效）
+# 1. 宿主侧：开屏动画（宿主侧代码要**重启** DSH 才生效）
 node dsh-boot-gallery/tools/install.mjs --profile desktop
 
-# 2. 页面侧：悬浮球 + 壁纸面板 + 磨砂玻璃（刷新即可）
+# 2. 页面侧：悬浮球 + 壁纸面板 + 磨砂玻璃
+#    这一步**会顺带把自带的三套风景装进 ~/.dsh/boot-naruto/arts/**
+#    （2026-11-22 修：以前只拷进 node_modules，arts/ 是空的 ⇒ 预设 0 套 ⇒ 开屏退化成黑屏兜底）
 node dsh-boot-suites/gallery/tools/install.mjs --profile desktop
 ```
 
 两个脚本都会：校验源文件 → 备份 profile 的 `cordis.patch.yml` → 复制并**逐文件核摘要** →
 确保 patch 里有对应条目（已有就不重复追加）。
+
+第二条末尾还会自动跑一次 `dsh-boot-suites/gallery/tools/install-arts.mjs`，
+把仓库自带的三套风景（清寒 / 暖秋 / 夜潮）拷进 `~/.dsh/boot-naruto/arts/`——
+**那是宿主真正读素材的地方**，不拷过去面板里就是 0 套、开屏会退化成黑屏兜底。
+不想要这三套图的人加 `--no-arts` 跳过；想手动补也可以直接跑：
+
+```bash
+node dsh-boot-suites/gallery/tools/install-arts.mjs
+```
 
 **不需要编译**：`lib/client.js` 等构建产物已随仓库提供。只有改 `parts/` 源码的人才需要重建。
 
@@ -75,7 +86,11 @@ node dsh-boot-suites/gallery/tools/install.mjs --profile desktop
 [添加主题素材包](dsh-gallery-pack/tools/添加主题素材包.md)。
 
 > macOS / Linux 上同样两条命令（把 `--profile desktop` 保持不变）。
-> ⚠ 本仓库在 **Windows 上验证过**；macOS 未经实机验证，遇到报错请开 issue。
+> ✅ 2026-11-22 在 **macOS（Apple Silicon，DSH 桌面版）** 上跑通了完整安装链路；
+> ⚠ macOS 上宿主/页面插件都是**热挂载**的，但**改了 `lib/client.js` 之后要重载一次页面**才生效——
+> 桌面版没有 `View → Reload` 菜单，`Cmd+R` 也不一定绑得上，最稳的是重启应用。
+> ⚠ 若你的 DSH 版本聊天节点结构不同（控制台出现 `card-target-missing`），
+> 把 `dsh-boot-suites/gallery/data/surfaces.json` 里的 `card` / `cardKinds` 选择器按实际 DOM 改即可，不用动代码。
 
 ## 发货闸门（改代码的人看）
 

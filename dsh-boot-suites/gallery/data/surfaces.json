@@ -7,34 +7,35 @@
     "[data-conversation-content]",
     "[data-conversation-scroll]"
   ],
-  "card": "[data-chat-flow-kind]:not([data-chat-flow-kind=\"user\"]):not([data-chat-flow-kind=\"steering\"]) > [data-slot=\"conversation.chat.node\"] > div",
+  "card": "[data-chat-flow-kind]:not([data-chat-flow-kind=\"user\"]):not([data-chat-flow-kind=\"steering\"]) [data-slot=\"conversation.chat.node\"] > div",
   "_card_mechanism": "2026-11-14 考古定案(app.asar / dsh-client-ui-renderer/lib/client.js:1088-1103):SlotOutlet 渲染成 <div data-slot=… style=\"display:contents\">,注释原文 \"keeps the wrapper out of layout … the anchor is purely addressable surface\"。**display:contents 不生成盒子** ⇒ 给它加 background/padding/border **完全没有视觉效果**。这就是上一版『选择器没错、卡片却看不见』的真因(自测当时数到了节点数,却数不出'有没有盒子'——所以这次连盒子一起验)。正解 = 往下一层:outlet 的唯一子 div 就是内容根(AssistantMarkdown 的 .v5IAXa_root,逐字源码 ui-chat:5955;它是真盒子、宿主没给它任何 background)。用 `> div` 而不是哈希类名,升级不容易碎。",
   "_card_not_user": "user/steering 用 :not() 排除:它们自带 `.cJsG2q_bubble{background:var(--dsw-specific-bubble)}`(实底气泡,真机也证实清楚可读),再套一层卡片会变成框中框。",
   "cardBox": "padding:6px 12px;",
   "cardBox_note": "盒子内边距加在**内容根**上(不是那个 contents 锚点)。上一版还配了 margin 负值去抵宿主 padding,现在目标层变了,先只用 padding;真机若嫌卡片之间太挤,加 row-gap 类的规则到 surfaces.json 而不是改这里。",
   "cardKinds": {
     "assistant": [
-      "[data-chat-flow-kind=\"assistant-step\"] > [data-slot=\"conversation.chat.node\"] > div",
-      "[data-chat-flow-kind=\"question-reply\"] > [data-slot=\"conversation.chat.node\"] > div"
+      "[data-chat-flow-kind=\"assistant-step\"] [data-slot=\"conversation.chat.node\"] > div",
+      "[data-chat-flow-kind=\"question-reply\"] [data-slot=\"conversation.chat.node\"] > div"
     ],
     "quiet": [
-      "[data-chat-flow-kind=\"tool-call\"] > [data-slot=\"conversation.chat.node\"] > div",
-      "[data-chat-flow-kind=\"turn-process\"] > [data-slot=\"conversation.chat.node\"] > div",
-      "[data-chat-flow-kind=\"turn-trigger\"] > [data-slot=\"conversation.chat.node\"] > div",
-      "[data-chat-flow-kind=\"command\"] > [data-slot=\"conversation.chat.node\"] > div",
-      "[data-chat-flow-kind=\"command-input\"] > [data-slot=\"conversation.chat.node\"] > div",
-      "[data-chat-flow-kind=\"compaction\"] > [data-slot=\"conversation.chat.node\"] > div",
-      "[data-chat-flow-kind=\"manual-compaction\"] > [data-slot=\"conversation.chat.node\"] > div",
-      "[data-chat-flow-kind=\"context\"] > [data-slot=\"conversation.chat.node\"] > div",
-      "[data-chat-flow-kind=\"turn-error\"] > [data-slot=\"conversation.chat.node\"] > div",
-      "[data-chat-flow-kind=\"turn-max-tokens\"] > [data-slot=\"conversation.chat.node\"] > div",
-      "[data-chat-flow-kind=\"model-retry\"] > [data-slot=\"conversation.chat.node\"] > div",
-      "[data-chat-flow-kind=\"system-prompt\"] > [data-slot=\"conversation.chat.node\"] > div",
-      "[data-chat-flow-kind=\"workflow-run\"] > [data-slot=\"conversation.chat.node\"] > div",
-      "[data-chat-flow-kind=\"unknown\"] > [data-slot=\"conversation.chat.node\"] > div"
+      "[data-chat-flow-kind=\"tool-call\"] [data-slot=\"conversation.chat.node\"] > div",
+      "[data-chat-flow-kind=\"turn-process\"] [data-slot=\"conversation.chat.node\"] > div",
+      "[data-chat-flow-kind=\"turn-trigger\"] [data-slot=\"conversation.chat.node\"] > div",
+      "[data-chat-flow-kind=\"command\"] [data-slot=\"conversation.chat.node\"] > div",
+      "[data-chat-flow-kind=\"command-input\"] [data-slot=\"conversation.chat.node\"] > div",
+      "[data-chat-flow-kind=\"compaction\"] [data-slot=\"conversation.chat.node\"] > div",
+      "[data-chat-flow-kind=\"manual-compaction\"] [data-slot=\"conversation.chat.node\"] > div",
+      "[data-chat-flow-kind=\"context\"] [data-slot=\"conversation.chat.node\"] > div",
+      "[data-chat-flow-kind=\"turn-error\"] [data-slot=\"conversation.chat.node\"] > div",
+      "[data-chat-flow-kind=\"turn-max-tokens\"] [data-slot=\"conversation.chat.node\"] > div",
+      "[data-chat-flow-kind=\"model-retry\"] [data-slot=\"conversation.chat.node\"] > div",
+      "[data-chat-flow-kind=\"system-prompt\"] [data-slot=\"conversation.chat.node\"] > div",
+      "[data-chat-flow-kind=\"workflow-run\"] [data-slot=\"conversation.chat.node\"] > div",
+      "[data-chat-flow-kind=\"unknown\"] [data-slot=\"conversation.chat.node\"] > div"
     ]
   },
   "_kinds_source": "19 个 kind 取值来自 live 宿主:cordis_inspect_query(client / Slots / listSubTree, root=conversation.chat)的 keyDomain 'already taken' 清单;user/steering 归宿主自己的气泡,不在这两张表里。",
   "_quiet_note": "次要内容(工具调用/过程折叠/系统行)用更薄的一层底,免得整屏全是卡片、画面又被完全盖死。",
-  "legacy_assistant_removed": "2026-11-14:原 assistant[] 三条 `>` 规则与 dynCss 里硬编码的深色底一并作废,由上面的 card/cardKinds 取代。"
+  "legacy_assistant_removed": "2026-11-14:原 assistant[] 三条 `>` 规则与 dynCss 里硬编码的深色底一并作废,由上面的 card/cardKinds 取代。",
+  "_card_compat_note": "2026-11-22 macOS 实测补丁：宿主这个版本里 [data-chat-flow-kind] 不是 slot outlet 的直接父级（中间多包了一层），原来那条 `>` 选择器在本机 0 命中 ⇒ 磨砂玻璃一个都没上。改成后代组合器 ` ` 之后两头都能命中；仍然只打在内容根 div 上（不放裸锚点，锚点是 display:contents）。注意：不再追加逗号兜底 —— 自测替身的选择器解析器不支持逗号列表，且真机上 flow-kind 属性确实存在。"
 }

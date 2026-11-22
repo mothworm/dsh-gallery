@@ -129,8 +129,35 @@ for (const prof of targets) {
   }
 }
 
+// —— 2026-11-22：自带三套风景**必须**一起装进 arts/ ——
+//
+// 实测（macOS 干净机器）：只跑 README 的「两条命令」时，
+//   ~/.dsh/boot-naruto/arts/ 是空的 ⇒ 宿主 presets.json 返回 count:0
+//   ⇒ 开屏插件退化成"内置兜底 9 幕"，而那张兜底要的帧图不存在（frames=missing）
+//   ⇒ 整屏被深色遮罩卡住，右下角红字"开屏插件里一个预设都没有"。
+// 也就是说「装完就有三套风景」这句承诺，光把 arts-builtin 拷进 node_modules 是兑现不了的：
+// 宿主要读的是 arts/ 目录。所以在这里补上第三步（install-arts.mjs），让人真的只跑两条命令。
+//
+// --no-arts 可以跳过（只想要代码、不想要那 2.4 MB 图的人）。
+if (!dry && !process.argv.includes('--no-arts')) {
+  const artsTool = path.join(HERE, 'install-arts.mjs')
+  if (fs.existsSync(artsTool)) {
+    console.log('\n=== 自带风景主题（第三条命令，已自动执行）===')
+    try {
+      const { execFileSync } = await import('node:child_process')
+      execFileSync(process.execPath, [artsTool], { stdio: 'inherit' })
+    } catch (e) {
+      console.error('!! 自带风景装失败（插件代码已装好，可稍后手动跑 tools/install-arts.mjs）')
+      console.error('   ' + (e && e.message ? e.message : e))
+      process.exitCode = 1
+    }
+  } else {
+    console.log('\n!! 没找到 tools/install-arts.mjs —— 自带三套风景不会被装进 arts/')
+  }
+}
+
 console.log('\n下一步:')
-console.log('  1. 新 bundle 要生效,得改 patch 里的 insert —— 按本机经验 watchUserPatches 会热挂载,**先试硬刷新 Ctrl+Shift+R**')
+console.log('  1. 宿主侧/页面侧的 patch 都会热挂载;客户端 bundle 变了要重载一次页面(桌面版没有 View→Reload,重启应用最稳)')
 console.log('  2. 刷新后控制台敲 window.__dshBootSuite.diag() —— surface 应该是 [data-conversation-content]')
 console.log('  3. diag().warns 里有 boot-api-missing 就是开屏插件没先起来;有 art-target-missing 就是画面退回浮层(要改 data/surfaces.json)')
 console.log('  4. 真需要重启的话:**先问用户**,他可能正挂着 SSH 隧道')

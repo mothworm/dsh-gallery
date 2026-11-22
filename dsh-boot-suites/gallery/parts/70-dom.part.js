@@ -162,7 +162,10 @@ function chipText(st) {
 // 数两件事:**命中几个**、以及**其中几个真生成盒子**。
 // 只数命中是不够的 —— [data-slot] 锚点带 display:contents,命中了也画不出底(2026-11-14 真机定案)。
 function probeCards() {
-	const sel = (SURFACES && SURFACES.card) || '[data-chat-flow-kind] > [data-slot="conversation.chat.node"] > div';
+	// 2026-11-22：surfaces.json 缺席时的兜底也放宽成「后代组合器 + 裸锚点」两条，
+	// 免得本机（flow-kind 不是直接父级）落回单条 `>` 选择器又 0 命中。
+	const sel = (SURFACES && SURFACES.card)
+		|| '[data-chat-flow-kind] [data-slot="conversation.chat.node"] > div';
 	let n = -1, boxy = 0;
 	try {
 		const list = document.querySelectorAll(sel);
