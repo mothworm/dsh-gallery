@@ -467,7 +467,22 @@ window.__ModuleLoader__.load({
 			timers.push(setTimeout(finish, t + 240));
 		}
 		// 内置兜底:永远是那 9 幕,一个字节都不许变
-		function playBuiltin() { playTimeline(TIMELINE); }
+		// 2026-11-24：内置兜底也要"有兜底的兜底"。
+		// 仓库**不分发任何 frames/ 图片**，TIMELINE 里的 src 在干净机器上必然 404，
+		// 以前会糊出一层黑屏 + 红环，看起来像"装坏了"。现在先探第一张帧图：
+		// 取不到就**直接不播**，把首屏还给宿主。
+		function playBuiltin() {
+			const first = (TIMELINE.find((a) => a && a.src) || {}).src;
+			if (!first) { finish(); return; }
+			if (typeof Image === "undefined") { playTimeline(TIMELINE); return; }
+			const probe = new Image();
+			probe.onload = () => { playTimeline(TIMELINE); };
+			probe.onerror = () => {
+				report({ mode: "skip", clips: -1, clip: "", preset: "", acts: 0, why: "builtin-frames-missing" });
+				finish();
+			};
+			probe.src = first;
+		}
 
 		// ---- mp4 接口:宿主目录里有片子就播片子 ----
 		function probeClips(cb) {
