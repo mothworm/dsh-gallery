@@ -63,6 +63,20 @@
 > 2026-11-22 在 macOS（Apple Silicon）上实测：这台机器一开始**就没装 node**，
 > 第一条命令直接 `zsh: command not found: node`。所以把它写进前提，别让下一个人也卡在这。
 
+### 平台差异（只有这几处不一样，安装命令本身是一致的）
+
+| 事情 | macOS | Windows |
+|---|---|---|
+| 装 Node | `brew install node` | `winget install OpenJS.NodeJS.LTS` 或官网 installer |
+| 家目录写法 | `~/.dsh` | `%USERPROFILE%\.dsh`（PowerShell 里写 `$HOME\.dsh`） |
+| 硬刷新页面 | `Cmd + Shift + R` | `Ctrl + Shift + R` |
+| 装完生效 | 宿主侧热挂载，改 `lib/client.js` 要重载页面 | 同左 |
+| 实机验证 | ✅ macOS（Sequoia 15.6 / Apple Silicon，2026-11-22） | ✅ Windows（作者本机，装插件 + 素材包流程） |
+
+> 只有"装 Node"这一步两边命令不同；**下面两条安装命令在两边完全一样**，
+> 所以这份 README 不拆成两份 —— 拆了必然有一份会忘记同步。
+> 插件读取路径用的是 `os.homedir()`，`~` / `%USERPROFILE%` 由脚本自己处理，你不用改。
+
 ## 装（两条命令）
 
 ```bash
