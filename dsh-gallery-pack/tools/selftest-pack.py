@@ -119,15 +119,37 @@ for zname in THEME_ZIPS:
     ok(not bad_acts, "%s: 每套的幕图都在包里。问题: %s" % (zname, bad_acts or "无"))
     ok(not no_eye, "%s: eye.photo 指向的图都在包里(缺了悬浮球静默变灰圈)。问题: %s" % (zname, no_eye or "无"))
 
-    # 文档必须是 .txt(用户:不是谁都装 typora)
+    # 文档以 .txt 为主(用户:不是谁都装 typora),但允许**点名**的 .md
+    #
+    # 2026-11-24 改:v2 包新增了「开工必读-开机画面.md」,原来那条
+    # 「包根不含 .md」于是报红。查证后是**包的意图变了**,不是包坏了:
+    # 那份排查指南同时要在 GitHub 上好看,用 .md 是刻意的。
+    # 所以从"一律不许"改成"白名单放行 + 其余仍然报红" —— 闸门还有牙,
+    # 只是不再误伤已知的那一份。
     docs = [n for n in ns if "/" not in n]
+    MD_OK = {"开工必读-开机画面.md"}
     ok("导入指南.txt" in docs, "%s: 包根有 导入指南.txt" % zname)
     ok("给朋友的提示词.txt" in docs, "%s: 包根有 给朋友的提示词.txt" % zname)
     ok("INDEX.txt" in docs, "%s: 包根有 INDEX.txt(纯文本索引)" % zname)
-    ok(not [n for n in docs if n.endswith(".md")],
-       "%s: 包根不含 .md(对方没装 Markdown 工具会看到满屏 # 和 |)" % zname)
-    ok(not [n for n in ns if n.startswith("ui/") or n.startswith("clips/") or n.startswith("frames/")],
-       "%s: 不含已退役的 ui/ clips/ frames/(五遁底框与开屏视频已废弃)" % zname)
+    stray_md = [n for n in docs if n.endswith(".md") and n not in MD_OK]
+    ok(not stray_md,
+       "%s: 包根的 .md 只允许白名单内的(其余:对方没装 Markdown 工具会看到满屏 # 和 |)。越界: %s"
+       % (zname, stray_md or "无"))
+
+    # ui/ 与 frames/ = 五遁位图底框时代的产物,已彻底退役,包内不许出现。
+    #
+    # clips/ **不是退役** —— 2026-11-24 查证:lib/index.js:43 的 clipsDir()
+    # 仍在读 ~/.dsh/boot-naruto/clips/,只是语义从"丢进去就全局播"
+    # 改成"preset.json 写 clip 字段点名才播"(client.js:52 VIDEO_GLOBAL=false)。
+    # 原来那条断言把 clips/ 和 ui/frames 并列写成"已废弃",措辞是错的。
+    # 现在改成:ui/ frames/ 一律不许;clips/ 只许放视频文件。
+    ok(not [n for n in ns if n.startswith("ui/") or n.startswith("frames/")],
+       "%s: 不含已退役的 ui/ frames/(五遁位图底框已废弃)" % zname)
+    VID_EXT = (".mp4", ".m4v", ".webm", ".mov", ".mkv")
+    bad_clip = [n for n in ns if n.startswith("clips/") and not n.endswith(VID_EXT)]
+    ok(not bad_clip,
+       "%s: clips/ 下只放视频文件(其余:宿主只列视频,别的文件是死重量)。越界: %s"
+       % (zname, bad_clip or "无"))
 
 # 现行打包器必须是 pack-themes.py,退役的 pack-arts.py 不许再产包
 build = open(os.path.join(PACK, "tools", "pack-themes.py"), encoding="utf-8").read()
