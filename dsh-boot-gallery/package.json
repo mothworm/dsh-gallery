@@ -25,5 +25,8 @@
       "immediately": true
     }
   },
+  "engines": {
+    "node": ">=20"
+  },
   "license": "BSD-3-Clause"
 }
