@@ -35,6 +35,25 @@ const PKGROOT = path.resolve(HERE, '..')
 const pkg = JSON.parse(fs.readFileSync(path.join(PKGROOT, 'package.json'), 'utf8'))
 const NAME = pkg.name
 
+// —— Node 版本闸门 ——
+// 为什么要有：README 写的是「Node ≥ 20」，但那只是一句话；
+// `package.json` 的 engines 字段只有 npm 会看，而用户跑的是
+// `node tools/install.mjs` —— 完全绕过 npm。于是用 Node 18 的人不会收到
+// 任何警告，而是撞上一个莫名其妙的语法/API 报错，然后来问「你这不是能装吗」。
+// 这里在**动手改 profile 之前**先拦一次，把话说清楚。
+const MIN_NODE = 20
+const nodeMajor = Number((process.versions.node || '0').split('.')[0])
+if (!Number.isFinite(nodeMajor) || nodeMajor < MIN_NODE) {
+  console.error('')
+  console.error('!! 这个安装脚本需要 Node.js >= ' + MIN_NODE + '，当前是 ' + process.version)
+  console.error('   先升级 Node，再重跑这条命令：')
+  console.error('     macOS   brew install node')
+  console.error('     Windows winget install OpenJS.NodeJS.LTS   或用官方 installer')
+  console.error('   检查   node -v   (应显示 v20 或更高)')
+  console.error('')
+  process.exit(1)
+}
+
 let profile = null
 const _pi = process.argv.indexOf('--profile')
 if (_pi >= 0 && process.argv[_pi + 1]) profile = process.argv[_pi + 1]
