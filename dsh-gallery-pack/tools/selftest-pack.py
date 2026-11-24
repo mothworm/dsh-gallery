@@ -156,8 +156,17 @@ build = open(os.path.join(PACK, "tools", "pack-themes.py"), encoding="utf-8").re
 ok('"导入指南.txt"' in build and '"给朋友的提示词.txt"' in build,
    "pack-themes.py 打的是 .txt 文档(不是 .md)")
 ok('"INDEX.txt"' in build, "pack-themes.py 把 INDEX.txt 打进包")
-ok('"ui/"' not in build and '"clips/"' not in build,
-   "pack-themes.py 不打已退役的 ui/ 与 clips/")
+
+# 2026-11-24 改:原来这条写的是「不打已退役的 ui/ 与 clips/」,把两者并列了。
+# 但 clips/ **不是退役** —— lib/index.js:43 的 clipsDir() 一直在读它,
+# 只是语义从"丢进去就全局播"改成"preset.json 写 clip 字段点名才播"。
+# 真实缺口恰好相反:pack-themes.py 原先**漏打** clips/,
+# 于是重打出来的包永远是"17 套 + 没有视频",而 preset.json 里写着
+# clip: tobirama-night.mp4 ⇒ 朋友看到永夜那套播的是图不是视频。
+# 现在改成:ui/ 仍然不许(五遁位图底框真退役),clips/ 必须打。
+ok('"ui/"' not in build, "pack-themes.py 不打已退役的 ui/(五遁位图底框)")
+ok('"clips/"' in build or '"clips"' in build,
+   "pack-themes.py 会打 clips/(永夜扉间的开机视频,漏了那套就退回图片分镜)")
 
 # 两份 txt 说明的关键内容(写给朋友,少一句他就装不上)
 guide = open(os.path.join(PACK, "导入指南.txt"), encoding="utf-8").read()
