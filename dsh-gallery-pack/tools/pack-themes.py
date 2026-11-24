@@ -131,17 +131,42 @@ def main():
         # ⚠ 2026-11-22:改发 **.txt**。用户:「不是谁都装 typora」——
         # .md 在没装 Markdown 工具的 Windows 上会被记事本当纯文本打开、满屏 # 和 |。
         # 给朋友的包要"双击就能读",所以用 .txt。
-        for doc_name in ("导入指南.txt", "给朋友的提示词.txt"):
+        #
+        # ⚠ 2026-11-24 补:加 `开工必读-开机画面.md` —— v2 包里有这份,
+        #   但当时是在 mac 上手工组的包,这个脚本并没有打它。
+        #   它是 .md 不是 .txt,属于**有意破例**:那份同时要在 GitHub 上好看。
+        #   `selftest-pack.py` 对它在包根 .md 白名单里单独放行。
+        for doc_name in ("导入指南.txt", "给朋友的提示词.txt", "开工必读-开机画面.md"):
             p = os.path.join(PACK, doc_name)
             if os.path.isfile(p):
                 z.write(p, doc_name)
                 entries.append(doc_name)
+            else:
+                print("  !! 缺文档: %s(包里会没有这一份)" % doc_name)
         # 索引:包里带 txt(人看) + json(程序看);md 那份是给我们自己看的,不进包
         for idx in ("INDEX.txt", "INDEX.json"):
             p = os.path.join(SRC, idx)
             if os.path.isfile(p):
                 z.write(p, idx)
                 entries.append(idx)
+
+        # clips/:永夜扉间那套的开机动画视频(2026-11-24 补)
+        #
+        # 为什么这个脚本原先没有:它的前身 pack-arts.py 打的是"整包"
+        # (开屏分镜 + 八幕动画 + clips),后来改成只打主题,clips 就漏了。
+        # 而 v2 包里确实有 clips/tobirama-night.mp4,是手工补进去的 ——
+        # 不补这一步,以后打出来的包永远缺那段视频,而 preset.json 里
+        # 写着 clip: tobirama-night.mp4,朋友会看到"永夜那套播的是图不是视频"。
+        clips_src = os.path.join(PACK, "clips")
+        if os.path.isdir(clips_src):
+            vid_ext = (".mp4", ".m4v", ".webm", ".mov", ".mkv")
+            for f in sorted(os.listdir(clips_src)):
+                if f.lower().endswith(vid_ext):
+                    p = os.path.join(clips_src, f)
+                    z.write(p, "clips/" + f)
+                    entries.append("clips/" + f)
+        else:
+            print("  !! 缺 clips/ 目录(包里会没有视频,永夜那套会退回图片分镜)")
 
     # 自检:条目数对得上、没有混进 .bak、没有空文件
     with zipfile.ZipFile(out) as z:

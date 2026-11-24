@@ -113,6 +113,10 @@ def inspect(pdir):
         "acts": len(shots),
         "shots": shots,
         "eye": eye_info,
+        # 2026-11-24 补:有些主题用一段视频做开机画面(preset.json 写
+        # clip: "xxx.mp4",视频放 dsh-gallery-pack/clips/ 而不是主题目录里)。
+        # 不把它读出来,索引就没法提醒"这段要单独拷到 ~/.dsh/boot-naruto/clips/"。
+        "clip": str(doc.get("clip") or ""),
         "bytes": total,
     }, probs
 
@@ -201,7 +205,16 @@ def main():
     t = ["素材包索引", "=" * 60, "",
          "共 %d 套,%.1f MB。由 dsh-gallery-pack/tools/build-index.py 生成。" % (len(entries), total_bytes / 1048576.0), "",
          "开机画面 = 桌面主题(同一批图,选一套两处一起换)。",
-         "悬浮球 = eye.photo 指向的图;没写的用程序画的图案。", ""]
+         "悬浮球 = eye.photo 指向的图;没写的用程序画的图案。"]
+    # 2026-11-24 补:`clips/` 那段视频不在 arts/ 里,索引原本完全不提它。
+    # 朋友会以为"永夜扉间怎么播的是图片",其实是要把 clips/ 拷到
+    # ~/.dsh/boot-naruto/clips/。有视频才写这一行,避免没有视频的包说空话。
+    clip_rows = [e for e in entries if e.get("clip")]
+    if clip_rows:
+        for e in clip_rows:
+            t.append("开机视频 = clips/%s(%s 那套;要单独拷到 ~/.dsh/boot-naruto/clips/)。"
+                     % (e["clip"], e["title"]))
+    t.append("")
     t.append("%-16s %-16s %4s  %-18s %10s" % ("目录名", "名称", "幕数", "球心", "字节"))
     t.append("-" * 74)
     for e in entries:
