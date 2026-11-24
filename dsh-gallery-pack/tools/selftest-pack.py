@@ -62,13 +62,35 @@ for _d in (PACK, _REPO):
     if os.path.isdir(_d):
         _SCAN += [os.path.join(_d, n) for n in os.listdir(_d)
                   if n.startswith("dsh-gallery-handson-") and n.endswith(".zip")]
+
+# ⚠ 2026-11-25 修:只测**最新那一个**包。
+#
+# 为什么:原来是把扫到的每个 handson zip 都测一遍。当时目录里只有一个,
+# 所以没问题;但一旦有人把旧包也放在同一层(或从 _package-archive/ 挪回来),
+# 旧包会用**今天的规则**去测 —— 例如 v2 缺了导入指南里那三句提醒,
+# 于是自测报红,而真正该看的现行包其实是好的。
+# 实测:同一份代码,目录里只有 v3 时报 35 条,把 v2 也放回来就报 48 条,
+# 其中包含针对 v2 的失败断言 —— 断言条数随"磁盘上放了几个包"漂移,
+# 这本身就是坏味道。
+#
+# 现行语义:磁盘上最新的那个 handson 包 = 要交付的包,只对它负责。
 zips = sorted(os.path.basename(p) for p in _SCAN)
 
 print("仓库根: %s" % _REPO)
-print("现行主题包: %s\n" % (zips or "(无)"))
+print("扫到的手上包: %s\n" % (zips or "(无)"))
 
-THEME_ZIPS = [n for n in zips if n.startswith("dsh-gallery-handson-") and n.endswith(".zip")]
-ok(len(THEME_ZIPS) >= 1, "包目录里有现行主题包 dsh-gallery-handson-*.zip(找到 %d 个: %s)" % (len(THEME_ZIPS), THEME_ZIPS))
+_all_handson = [p for p in _SCAN if os.path.basename(p).startswith("dsh-gallery-handson-")]
+THEME_ZIPS = []
+if _all_handson:
+    _newest = max(_all_handson, key=os.path.getmtime)
+    THEME_ZIPS = [os.path.basename(_newest)]
+    if len(_all_handson) > 1:
+        _others = sorted(os.path.basename(p) for p in _all_handson if p != _newest)
+        print("注意:同层还有 %d 个旧包(%s),本次只测最新的 %s。"
+              "旧包请移到 _package-archive/。\n"
+              % (len(_others), ", ".join(_others), THEME_ZIPS[0]))
+
+ok(len(THEME_ZIPS) >= 1, "包目录里有现行主题包 dsh-gallery-handson-*.zip(测最新的:%s)" % THEME_ZIPS)
 
 for zname in THEME_ZIPS:
     zp = os.path.join(PACK, "..", zname) if not os.path.isfile(os.path.join(PACK, zname)) else os.path.join(PACK, zname)
